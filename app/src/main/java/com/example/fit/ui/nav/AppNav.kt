@@ -35,11 +35,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.fit.R
 import com.example.fit.ui.appContainer
 import com.example.fit.ui.components.LocalFlipFrame
+import com.example.fit.ui.picker.ExercisePickerScreen
 import com.example.fit.ui.profile.ProfileScreen
 import com.example.fit.ui.profile.WelcomeScreen
+import com.example.fit.ui.routines.RoutineEditorScreen
 import com.example.fit.ui.routines.RoutinesScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -102,8 +105,29 @@ fun AppNav() {
                 composable<ProgressRoute> { Placeholder("screen-progress") }
                 composable<HistoryRoute> { Placeholder("screen-history") }
                 composable<ProfileRoute> { ProfileScreen() }
-                composable<RoutineEditorRoute> { Placeholder("screen-routine-editor") }
-                composable<ExercisePickerRoute> { Placeholder("screen-exercise-picker") }
+                composable<RoutineEditorRoute> { entry ->
+                    val route = entry.toRoute<RoutineEditorRoute>()
+                    val picked by entry.savedStateHandle.getStateFlow<String?>(PICKED_EXERCISE_KEY, null)
+                        .collectAsStateWithLifecycle()
+                    RoutineEditorScreen(
+                        routineId = route.routineId,
+                        pickedExerciseId = picked,
+                        onPickedHandled = { entry.savedStateHandle[PICKED_EXERCISE_KEY] = null },
+                        onPickExercise = { navController.navigate(ExercisePickerRoute(routineId = route.routineId)) },
+                        onDone = { navController.popBackStack() },
+                    )
+                }
+                composable<ExercisePickerRoute> { entry ->
+                    ExercisePickerScreen(
+                        route = entry.toRoute(),
+                        onPicked = { exerciseId ->
+                            // Hand the choice to the screen that asked for it.
+                            navController.previousBackStackEntry?.savedStateHandle?.set(PICKED_EXERCISE_KEY, exerciseId)
+                            navController.popBackStack()
+                        },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
                 composable<ExerciseDetailRoute> { Placeholder("screen-exercise-detail") }
                 composable<WorkoutDetailRoute> { Placeholder("screen-workout-detail") }
             }

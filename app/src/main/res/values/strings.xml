@@ -87,4 +87,61 @@
     <string name="duplicate">Duplicate</string>
     <string name="delete">Delete</string>
     <string name="create">Create</string>
+
+    <!-- Shared -->
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="rename">Rename</string>
+    <string name="add_exercise">Add exercise</string>
+    <string name="add_set">Add set</string>
+    <string name="remove_named">Remove %1$s</string>
+    <string name="new_record">New record</string>
+    <string name="unit_extra_kg">extra kg</string>
+    <string name="unit_reps">reps</string>
+    <string name="unit_min">min</string>
+
+    <!-- One set: what the − / + buttons, the tick and the remove button are called -->
+    <string name="set_decrease_weight">Decrease weight, set %1$d</string>
+    <string name="set_increase_weight">Increase weight, set %1$d</string>
+    <string name="set_decrease_reps">Decrease reps, set %1$d</string>
+    <string name="set_increase_reps">Increase reps, set %1$d</string>
+    <string name="set_decrease_minutes">Decrease minutes</string>
+    <string name="set_increase_minutes">Increase minutes</string>
+    <string name="set_done">Set %1$d done</string>
+    <string name="set_remove">Remove set %1$d</string>
+
+    <!-- Muscle groups -->
+    <string name="group_chest">Chest</string>
+    <string name="group_back">Back</string>
+    <string name="group_shoulders">Shoulders</string>
+    <string name="group_arms">Arms</string>
+    <string name="group_legs">Legs</string>
+    <string name="group_core">Core</string>
+    <string name="group_cardio">Cardio</string>
+    <string name="equipment_none">no equipment</string>
+
+    <!-- Routine editor -->
+    <string name="editor_title">Edit routine</string>
+    <string name="editor_exercises">Exercises: tap one to set its sets, hold the handle to reorder</string>
+    <string name="editor_drag_handle">Reorder %1$s</string>
+
+    <!-- Exercise search -->
+    <string name="picker_search">Search exercises</string>
+    <string name="picker_all">All</string>
+    <string name="picker_added">Added</string>
+    <string name="picker_create">Create \"%1$s\" as my own exercise</string>
+    <string name="picker_none">No exercises found</string>
+    <string name="picker_delete_question">Delete %1$s? Its past workouts stay in your history.</string>
+    <string name="new_exercise">New exercise</string>
+    <string name="exercise_name">Exercise name</string>
+    <string name="muscle_group">Muscle group</string>
+    <string name="kind_question">How it is counted</string>
+    <string name="kind_choice_weights">Weights</string>
+    <string name="kind_choice_body_weight">Body weight</string>
+    <string name="kind_choice_reps_only">Reps only</string>
+    <string name="kind_choice_cardio">Cardio</string>
+    <string name="kind_explain_weights">Load is weight × reps.</string>
+    <string name="kind_explain_body_weight">For pull-ups, dips and push-ups: load is your body weight plus any extra weight, × reps.</string>
+    <string name="kind_explain_reps_only">Only reps are counted. It adds nothing to load.</string>
+    <string name="kind_explain_cardio">Tracked in minutes. It adds nothing to load.</string>
 </resources>

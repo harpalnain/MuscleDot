@@ -57,3 +57,20 @@ fun formatDayLong(date: LocalDate): String = DAY_LONG.format(date)
 
 /** "5 Nov" */
 fun formatDayShort(date: LocalDate): String = DAY_SHORT.format(date)
+
+/**
+ * One line describing an exercise's sets, from its first set: "3 sets · 40 kg × 10".
+ * Body weight with extra weight reads "3 sets · +5 kg × 10"; body weight without
+ * extra and reps only read "3 sets · 10 reps"; cardio reads "10 min".
+ */
+fun setsSummary(kind: ExerciseKind, sets: List<SetValues>): String {
+    val first = sets.firstOrNull() ?: SetValues()
+    if (kind == ExerciseKind.CARDIO) return "${first.minutes} min"
+    val count = if (sets.size == 1) "1 set" else "${sets.size} sets"
+    val each = when {
+        kind == ExerciseKind.WEIGHTS -> "${formatKg(first.weightHg.toLong())} × ${first.reps}"
+        kind == ExerciseKind.BODY_WEIGHT && first.weightHg > 0 -> "+${formatKg(first.weightHg.toLong())} × ${first.reps}"
+        else -> "${first.reps} reps"
+    }
+    return "$count · $each"
+}
