@@ -70,4 +70,21 @@
     <string name="backup_not_a_backup">That file is not an Overload backup</string>
     <string name="backup_newer_version">That backup was made by a newer version of the app</string>
     <string name="picture_credits">Exercise pictures: free-exercise-db (public domain)</string>
+
+    <!-- Routines -->
+    <string name="routines_my_week">My week: tap a day to change it</string>
+    <string name="routines_my_routines">My routines</string>
+    <string name="routines_new">New routine</string>
+    <string name="routines_delete_question">Delete %1$s? Past workouts stay in your history.</string>
+    <string name="routine_name">Routine name</string>
+    <string name="rest_day">Rest day</string>
+    <plurals name="exercise_count">
+        <item quantity="one">%1$d exercise</item>
+        <item quantity="other">%1$d exercises</item>
+    </plurals>
+    <string name="more_options_for">More options for %1$s</string>
+    <string name="edit">Edit</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="delete">Delete</string>
+    <string name="create">Create</string>
 </resources>

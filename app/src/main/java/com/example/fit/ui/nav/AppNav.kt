@@ -17,7 +17,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -41,8 +40,8 @@ import com.example.fit.ui.appContainer
 import com.example.fit.ui.components.LocalFlipFrame
 import com.example.fit.ui.profile.ProfileScreen
 import com.example.fit.ui.profile.WelcomeScreen
+import com.example.fit.ui.routines.RoutinesScreen
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
 
@@ -76,12 +75,9 @@ fun AppNav() {
         scope.launch { container.onForeground() }
     }
 
-    val ready by container.ready.collectAsStateWithLifecycle()
-    val welcomeDone by produceState<Boolean?>(initialValue = null, ready) {
-        if (ready) value = container.profile.observeProfile().first().welcomeDone
-    }
-    val showWelcome = welcomeDone?.not()
-    if (!ready || showWelcome == null) {
+    // Null while the app is still starting; nothing is shown until then.
+    val showWelcome = container.startOnWelcome.collectAsStateWithLifecycle().value
+    if (showWelcome == null) {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
         return
     }
@@ -100,7 +96,9 @@ fun AppNav() {
                     )
                 }
                 composable<TodayRoute> { Placeholder("screen-today") }
-                composable<RoutinesRoute> { Placeholder("screen-routines") }
+                composable<RoutinesRoute> {
+                    RoutinesScreen(onEdit = { navController.navigate(RoutineEditorRoute(it)) })
+                }
                 composable<ProgressRoute> { Placeholder("screen-progress") }
                 composable<HistoryRoute> { Placeholder("screen-history") }
                 composable<ProfileRoute> { ProfileScreen() }

@@ -14,6 +14,7 @@ import com.example.fit.domain.AppClock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 
 /**
@@ -37,15 +38,19 @@ class AppContainer(
     val seeder = Seeder(db) { appContext.assets.open(EXERCISES_ASSET).bufferedReader().use { it.readText() } }
     val today = TodayHolder(clock)
 
-    private val isReady = MutableStateFlow(false)
+    private val welcomePending = MutableStateFlow<Boolean?>(null)
 
-    /** True once the database is seeded and past days are closed; screens wait for it. */
-    val ready: StateFlow<Boolean> = isReady.asStateFlow()
+    /**
+     * Null until the app has started (database seeded, past days closed). Then true
+     * if the welcome screen has not been finished yet, so the app opens on it.
+     * Screens wait for this, and it is known before anything is shown.
+     */
+    val startOnWelcome: StateFlow<Boolean?> = welcomePending.asStateFlow()
 
     suspend fun initialize() {
         seeder.seedIfNeeded()
         onForeground()
-        isReady.value = true
+        welcomePending.value = !profile.observeProfile().first().welcomeDone
     }
 
     /** Moves to the current app day and saves workouts left over from earlier days (spec 5.6). */
