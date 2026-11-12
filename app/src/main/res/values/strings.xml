@@ -12,4 +12,22 @@
     <string name="kind_body_weight">body weight</string>
     <string name="kind_reps_only">reps only</string>
     <string name="kind_cardio">cardio</string>
+
+    <!-- Charts -->
+    <string name="chart_empty">No workouts yet</string>
+    <string name="chart_title_load">Load per session (kg)</string>
+    <string name="chart_title_reps">Reps per session</string>
+    <string name="chart_title_minutes">Minutes per session</string>
+    <string name="chart_legend_session">Each session</string>
+    <string name="chart_legend_average">Average of last %1$d</string>
+    <plurals name="chart_sessions_description">
+        <item quantity="one">%1$d session, latest %2$s, average %3$s</item>
+        <item quantity="other">%1$d sessions, latest %2$s, average %3$s</item>
+    </plurals>
+    <string name="chart_columns_description">%1$s, %2$d values</string>
+    <string name="chart_trend_description">%1$s, %2$d values, latest %3$s</string>
+    <string name="average_of_last">Average of last</string>
+    <string name="average_sessions">sessions</string>
+    <string name="average_fewer">Fewer sessions</string>
+    <string name="average_more">More sessions</string>
 </resources>

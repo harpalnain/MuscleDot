@@ -20,6 +20,9 @@ private fun kgText(hg: Long): String {
     return if (tenth == 0L) whole else "$whole.$tenth"
 }
 
+/** A plain figure with at most one decimal: "965", "987.5", "1,010". */
+fun formatNumber(value: Double): String = kgText(Math.round(value * 10))
+
 /** "1,010 kg", "42.5 kg", "0 kg". */
 fun formatKg(hg: Long): String = "${kgText(hg)} kg"
 
