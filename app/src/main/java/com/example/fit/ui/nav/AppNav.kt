@@ -39,6 +39,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fit.R
 import com.example.fit.ui.appContainer
 import com.example.fit.ui.components.LocalFlipFrame
+import com.example.fit.ui.profile.ProfileScreen
+import com.example.fit.ui.profile.WelcomeScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -92,12 +94,16 @@ fun AppNav() {
                 startDestination = if (showWelcome) WelcomeRoute else TodayRoute,
                 modifier = Modifier.padding(padding),
             ) {
-                composable<WelcomeRoute> { Placeholder("screen-welcome") }
+                composable<WelcomeRoute> {
+                    WelcomeScreen(
+                        onFinished = { navController.navigate(TodayRoute) { popUpTo<WelcomeRoute> { inclusive = true } } },
+                    )
+                }
                 composable<TodayRoute> { Placeholder("screen-today") }
                 composable<RoutinesRoute> { Placeholder("screen-routines") }
                 composable<ProgressRoute> { Placeholder("screen-progress") }
                 composable<HistoryRoute> { Placeholder("screen-history") }
-                composable<ProfileRoute> { Placeholder("screen-profile") }
+                composable<ProfileRoute> { ProfileScreen() }
                 composable<RoutineEditorRoute> { Placeholder("screen-routine-editor") }
                 composable<ExercisePickerRoute> { Placeholder("screen-exercise-picker") }
                 composable<ExerciseDetailRoute> { Placeholder("screen-exercise-detail") }

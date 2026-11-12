@@ -30,4 +30,44 @@
     <string name="average_sessions">sessions</string>
     <string name="average_fewer">Fewer sessions</string>
     <string name="average_more">More sessions</string>
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="done">Done</string>
+    <string name="unit_kg">kg</string>
+
+    <!-- Profile and welcome -->
+    <string name="profile_name">Name</string>
+    <string name="profile_date_of_birth">Date of birth</string>
+    <string name="profile_date_of_birth_unset">Tap to set</string>
+    <plurals name="profile_age">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+    <string name="profile_height">Height</string>
+    <string name="profile_feet">%1$d ft</string>
+    <string name="profile_inches">%1$d in</string>
+    <string name="profile_feet_unset">ft</string>
+    <string name="profile_inches_unset">in</string>
+    <string name="profile_body_weight">Body weight</string>
+    <string name="profile_body_weight_hint">Enter a weight from 20 to 400 kg</string>
+    <string name="profile_body_weight_decrease">Decrease body weight</string>
+    <string name="profile_body_weight_increase">Increase body weight</string>
+    <string name="body_weight_chart_title">Body weight (kg)</string>
+    <string name="welcome_title">Welcome to Overload</string>
+    <string name="welcome_explanation">Tell the app a little about you. Body weight is used for exercises like pull-ups. You can skip this and fill it in later under Profile.</string>
+    <string name="welcome_skip">Skip</string>
+
+    <!-- Backup -->
+    <string name="backup_section">Backup</string>
+    <string name="backup_export">Export backup file</string>
+    <string name="backup_import">Import backup file</string>
+    <string name="backup_explanation">Everything stays on this phone. To move to a new phone, export a backup file here and import it there.</string>
+    <string name="backup_replace_question">Replace everything in the app with this backup? This cannot be undone.</string>
+    <string name="backup_replace">Replace</string>
+    <string name="backup_saved">Backup saved</string>
+    <string name="backup_restored">Backup restored</string>
+    <string name="backup_not_a_backup">That file is not an Overload backup</string>
+    <string name="backup_newer_version">That backup was made by a newer version of the app</string>
+    <string name="picture_credits">Exercise pictures: free-exercise-db (public domain)</string>
 </resources>

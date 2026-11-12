@@ -10,8 +10,9 @@ private val LOCALE = Locale.US
 private val DAY_LONG = DateTimeFormatter.ofPattern("EEEE, d MMMM", LOCALE)
 private val DAY_SHORT = DateTimeFormatter.ofPattern("d MMM", LOCALE)
 private val BODY_WEIGHT_TEXT = Regex("""\d{1,3}(\.\d)?""")
-private const val MIN_BODY_WEIGHT_HG = 200
-private const val MAX_BODY_WEIGHT_HG = 4000
+/** Body weight is accepted from 20.0 to 400.0 kg. */
+const val MIN_BODY_WEIGHT_HG = 200
+const val MAX_BODY_WEIGHT_HG = 4000
 
 /** Kilograms with thousands separators, and one decimal only when needed: "1,010", "42.5". */
 private fun kgText(hg: Long): String {
