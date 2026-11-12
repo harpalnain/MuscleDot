@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -42,6 +43,9 @@ import com.example.fit.ui.overloadViewModel
 
 private const val NO_RECORD = "—"
 
+/** Width to height of nearly every exercise photo (400 × 267). */
+private const val PICTURE_ASPECT = 1.5f
+
 /** One exercise: its picture, its personal records and its chart (spec 6.4). */
 @Composable
 fun ExerciseDetailScreen(exerciseId: String, onBack: () -> Unit) {
@@ -70,8 +74,15 @@ fun ExerciseDetailContent(
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 16.dp),
         ) {
-            // The whole photo, not a crop: this is where the movement is looked at.
-            ExerciseImage(exercise, Modifier.fillMaxWidth().height(210.dp), contentScale = ContentScale.Fit)
+            // The whole photo, not a crop: this is where the movement is looked at. The frame has
+            // the photos' own shape, and stops growing on a wide screen.
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                ExerciseImage(
+                    exercise = exercise,
+                    modifier = Modifier.heightIn(max = 280.dp).aspectRatio(PICTURE_ASPECT),
+                    contentScale = ContentScale.Fit,
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = exerciseSubtitle(exercise),

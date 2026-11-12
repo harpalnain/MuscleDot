@@ -24,9 +24,11 @@ android {
 
     buildTypes {
         release {
+            // R8 over the whole app. The template's experimental packageScope (libraries only)
+            // built an app that crashed on launch: it moved part of the Kotlin library to
+            // another package than the non-public classes that part extends.
             optimization {
                 enable = true
-                packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
             }
         }
     }

@@ -6,10 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -337,20 +340,21 @@ private fun RoutineDropdown(selectedName: String, options: List<RoutineFilter>, 
 @Composable
 private fun WeeklySection(weekly: WeeklyProgress) {
     val colors = LocalOverloadColors.current
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    // One tile can have a note and the other none: both are as tall as the taller one.
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.height(IntrinsicSize.Min)) {
         val thisWeek = weekly.thisWeek
         StatTile(
             label = stringResource(R.string.progress_this_week),
             value = thisWeek?.let { formatKg(it.loadHg) } ?: NO_VALUE,
             note = thisWeek?.let { pluralStringResource(R.plurals.workout_count, it.workouts, it.workouts) },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         )
         val best = weekly.bestWeek
         StatTile(
             label = stringResource(R.string.progress_best_week),
             value = best?.let { formatKg(it.loadHg) } ?: NO_VALUE,
             note = best?.let { weekRangeText(it.weekStart) },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         )
     }
     ColumnChart(

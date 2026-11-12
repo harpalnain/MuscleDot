@@ -2,12 +2,17 @@ package com.example.fit.ui
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import com.example.fit.domain.BestSet
 import com.example.fit.domain.ChartPoint
 import com.example.fit.domain.Dated
@@ -133,15 +138,39 @@ class ProgressContentTest {
     }
 
     @Test
+    fun weeklyTilesAreOneItemEachAndEquallyTall() {
+        val weeks = listOf(WeekTotal(d(9), 0, 20, 1))
+        val state = ProgressUiState(section = ProgressSection.WEEKLY, weekly = WeeklyProgress(weeks, weeks[0], bestWeek = null))
+        rule.setContent { OverloadTheme { ProgressContent(state, actions) } }
+        // A tile is read as one item: its label, value and note together.
+        val thisWeek = rule.onNode(hasText("This week so far") and hasText("0 kg") and hasText("1 workout"))
+            .getUnclippedBoundsInRoot()
+        val best = rule.onNode(hasText("Best week") and hasText("—")).getUnclippedBoundsInRoot()
+        assertEquals(thisWeek.height, best.height)
+    }
+
+    private val detailState = ExerciseDetailUiState(
+        bench,
+        ExerciseRecords(Dated(450, d(5)), BestSet(4000, 400, 10, d(2)), Dated(10100L, d(5))),
+        listOf(RoutineFilter(1, "Chest"), RoutineFilter(2, "Full Body")),
+        selectedRoutineId = null,
+        series = series,
+        n = 10,
+    )
+
+    @Test
+    fun exerciseDetailPictureHasTheShapeOfThePhotos() {
+        rule.setContent {
+            OverloadTheme { ExerciseDetailContent(detailState, onSelectRoutine = {}, onChangeN = {}, onBack = {}) }
+        }
+        // The photos are 3:2; a frame of another shape would leave empty bands beside them.
+        val picture = rule.onNodeWithTag("exercise-image").getUnclippedBoundsInRoot()
+        assertEquals(1.5f, picture.width / picture.height, 0.02f)
+    }
+
+    @Test
     fun exerciseDetailShowsRecordsFiltersAndChart() {
-        val state = ExerciseDetailUiState(
-            bench,
-            ExerciseRecords(Dated(450, d(5)), BestSet(4000, 400, 10, d(2)), Dated(10100L, d(5))),
-            listOf(RoutineFilter(1, "Chest"), RoutineFilter(2, "Full Body")),
-            selectedRoutineId = null,
-            series = series,
-            n = 10,
-        )
+        val state = detailState
         val picked = mutableListOf<Long?>()
         rule.setContent {
             OverloadTheme { ExerciseDetailContent(state, onSelectRoutine = { picked += it }, onChangeN = {}, onBack = {}) }

@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,7 +49,10 @@ fun KindTag(kind: ExerciseKind, modifier: Modifier = Modifier) {
     )
 }
 
-/** A labelled figure, such as a personal record: label, value, and an optional note under it. */
+/**
+ * A labelled figure, such as a personal record: label, value, and an optional note under it.
+ * A screen reader reads the three as one item.
+ */
 @Composable
 fun StatTile(label: String, value: String, note: String?, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(12.dp)
@@ -57,6 +61,7 @@ fun StatTile(label: String, value: String, note: String?, modifier: Modifier = M
             .clip(shape)
             .background(MaterialTheme.colorScheme.surface)
             .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
+            .semantics(mergeDescendants = true) {}
             .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         Text(
