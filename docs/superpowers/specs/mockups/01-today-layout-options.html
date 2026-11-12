@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overload mockup: Today screen layout options</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg-primary: #f5f5f7; --bg-secondary: #ffffff; --bg-tertiary: #e5e5e7; --border: #d1d1d6;
+          --text-primary: #1d1d1f; --text-secondary: #6e6e73; --accent: #0071e3;
+          --selected-bg: #e8f4fd; --selected-border: #0071e3; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg-primary);
+         color: var(--text-primary); line-height: 1.5; padding: 2rem; }
+  h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: .5rem; }
+  h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: .25rem; }
+  .subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
+  .section { margin-bottom: 2rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-body { padding: 1rem; }
+  .card-body p { color: var(--text-secondary); font-size: .85rem; }
+  .decision { background: #e7f6ec; border: 1px solid #9fd3b0; color: #14532d; border-radius: 10px;
+              padding: .6rem .9rem; margin-bottom: 1.25rem; font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="decision"><strong>Decision:</strong> layout <strong>B (one exercise at a time)</strong> was chosen. Layout A is kept here only for reference.</div>
+<h2>Main screen: which layout feels right?</h2>
+<p class="subtitle">This is the "Today" screen you see when the app opens. Both versions show the same things: today's routine, each set with weight / reps / done tick, and the Finish button. The difference is how much is open at once. Click the one you prefer, then tell me in the terminal what you would change.</p>
+
+<style>
+  .cards.phones { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
+  .cards.phones .card { padding: 1.25rem 1rem 0.5rem; display: flex; flex-direction: column; align-items: center; }
+  .cards.phones .card-body { width: 100%; max-width: 340px; padding: 1rem 0.25rem; }
+  .cards.phones .card-body ul { margin: 0.4rem 0 0 1.1rem; color: var(--text-secondary); font-size: 0.85rem; }
+
+  .ph { width: 320px; height: 650px; border: 9px solid #18181b; border-radius: 34px; background: #f5f4fa; color: #1c1b1f;
+        overflow: hidden; display: flex; flex-direction: column; font-size: 12.5px; line-height: 1.35; text-align: left;
+        box-shadow: 0 10px 28px rgba(0,0,0,.28); }
+  .ph-top { padding: 14px 14px 10px; background: #fff; border-bottom: 1px solid #e6e4ee; }
+  .ph-date { color: #6b6a75; font-size: 11.5px; }
+  .ph-title { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+  .ph-title .name { font-size: 19px; font-weight: 700; }
+  .chip { border: 1px solid #c9c7d6; border-radius: 999px; padding: 3px 10px; font-size: 11px; color: #3c4bc0; background: #fff; white-space: nowrap; }
+  .week { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: #6b6a75; font-size: 11.5px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #d9d7e3; display: inline-block; }
+  .dot.on { background: #2e9e5b; }
+
+  .ph-body { flex: 1; overflow: hidden; padding: 10px 10px 0; display: flex; flex-direction: column; gap: 8px; }
+  .ex { background: #fff; border: 1px solid #e3e1ec; border-radius: 14px; padding: 10px 10px 8px; }
+  .ex-h { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 13.5px; margin-bottom: 6px; }
+  .ex-h small { font-weight: 500; color: #6b6a75; font-size: 11px; }
+  .cols, .row { display: grid; grid-template-columns: 18px 1fr 1fr 28px; align-items: center; column-gap: 8px; }
+  .cols { color: #8a8894; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .row { margin-bottom: 5px; }
+  .row .n { color: #6b6a75; font-weight: 600; text-align: center; }
+  .stp { display: flex; align-items: stretch; border: 1px solid #cfcdd9; border-radius: 9px; overflow: hidden; background: #fff; }
+  .stp b { width: 24px; text-align: center; font-weight: 700; color: #3c4bc0; background: #eceefb; padding: 4px 0; }
+  .stp i { flex: 1; font-style: normal; text-align: center; padding: 4px 2px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stp i u { text-decoration: none; color: #8a8894; font-weight: 500; font-size: 10.5px; }
+  .chk { width: 26px; height: 26px; border-radius: 8px; border: 2px solid #b9b7c6; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; }
+  .chk.on { background: #2e9e5b; border-color: #2e9e5b; }
+  .ex-f { display: flex; justify-content: space-between; align-items: center; color: #6b6a75; font-size: 11.5px; margin-top: 2px; }
+  .ex-f .add { color: #3c4bc0; font-weight: 600; }
+  .pr { background: #fff3cd; color: #8a5a00; border-radius: 6px; padding: 1px 6px; font-size: 10px; font-weight: 700; }
+
+  .line { background: #fff; border: 1px solid #e3e1ec; border-radius: 12px; padding: 9px 10px; display: flex; align-items: center; gap: 9px; }
+  .line .st { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #b9b7c6; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 800; flex-shrink: 0; }
+  .line .st.on { background: #2e9e5b; border-color: #2e9e5b; }
+  .line .nm { flex: 1; font-weight: 600; font-size: 13px; }
+  .line .meta { color: #6b6a75; font-size: 11px; text-align: right; }
+
+  .ph-fin { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: #fff; border-top: 1px solid #e6e4ee; }
+  .ph-fin .tot { font-size: 11px; color: #6b6a75; }
+  .ph-fin .tot strong { display: block; font-size: 15px; color: #1c1b1f; }
+  .btn { background: #3c4bc0; color: #fff; border-radius: 999px; padding: 9px 18px; font-weight: 700; font-size: 12.5px; }
+  .ph-nav { display: grid; grid-template-columns: repeat(5, 1fr); background: #eeedf6; border-top: 1px solid #e0deea; padding: 7px 2px 9px; }
+  .ph-nav div { text-align: center; font-size: 9.5px; color: #6b6a75; }
+  .ph-nav div span { display: block; font-size: 15px; line-height: 1.2; }
+  .ph-nav div.on { color: #3c4bc0; font-weight: 700; }
+</style>
+
+<div class="cards phones">
+
+  <!-- ============ OPTION A ============ -->
+  <div class="card" data-choice="A-everything-open">
+    <div class="ph">
+      <div class="ph-top">
+        <div class="ph-date">Thursday, 12 November</div>
+        <div class="ph-title"><div class="name">Chest + Triceps</div><div class="chip">Change routine</div></div>
+        <div class="week">This week: 3 of 5 done <span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+      <div class="ph-body">
+        <div class="ex">
+          <div class="ex-h">Bench Press <small>Best 45 kg</small></div>
+          <div class="cols"><span></span><span>Weight</span><span>Reps</span><span>Done</span></div>
+          <div class="row"><span class="n">1</span><span class="stp"><b>−</b><i>40.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>10</i><b>+</b></span><span class="chk on">✓</span></div>
+          <div class="row"><span class="n">2</span><span class="stp"><b>−</b><i>42.5 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>8</i><b>+</b></span><span class="chk on">✓</span></div>
+          <div class="row"><span class="n">3</span><span class="stp"><b>−</b><i>45.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>6</i><b>+</b></span><span class="chk"></span></div>
+          <div class="ex-f"><span class="add">+ Add set</span><span>Load 740 kg</span></div>
+        </div>
+        <div class="ex">
+          <div class="ex-h">Incline Dumbbell Press <small>Best 22.5 kg</small></div>
+          <div class="cols"><span></span><span>Weight</span><span>Reps</span><span>Done</span></div>
+          <div class="row"><span class="n">1</span><span class="stp"><b>−</b><i>20.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>12</i><b>+</b></span><span class="chk"></span></div>
+          <div class="row"><span class="n">2</span><span class="stp"><b>−</b><i>20.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>10</i><b>+</b></span><span class="chk"></span></div>
+          <div class="row"><span class="n">3</span><span class="stp"><b>−</b><i>22.5 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>8</i><b>+</b></span><span class="chk"></span></div>
+          <div class="ex-f"><span class="add">+ Add set</span><span>Load 0 kg</span></div>
+        </div>
+        <div class="ex">
+          <div class="ex-h">Triceps Pushdown <small>Best 30 kg</small></div>
+          <div class="cols"><span></span><span>Weight</span><span>Reps</span><span>Done</span></div>
+          <div class="row"><span class="n">1</span><span class="stp"><b>−</b><i>25.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>12</i><b>+</b></span><span class="chk"></span></div>
+        </div>
+      </div>
+      <div class="ph-fin"><div class="tot">Total load today<strong>740 kg</strong></div><div class="btn">Finish workout</div></div>
+      <div class="ph-nav"><div class="on"><span>●</span>Today</div><div><span>☰</span>Routines</div><div><span>◔</span>Progress</div><div><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="card-body">
+      <h3>A — Everything open</h3>
+      <p>All sets of all exercises are visible. You just scroll down as you train.</p>
+      <ul><li>Fewest taps</li><li>Long screen when a routine has many exercises</li></ul>
+    </div>
+  </div>
+
+  <!-- ============ OPTION B ============ -->
+  <div class="card" data-choice="B-one-at-a-time">
+    <div class="ph">
+      <div class="ph-top">
+        <div class="ph-date">Thursday, 12 November</div>
+        <div class="ph-title"><div class="name">Chest + Triceps</div><div class="chip">Change routine</div></div>
+        <div class="week">This week: 3 of 5 done <span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+      <div class="ph-body">
+        <div class="line"><span class="st on">✓</span><span class="nm">Bench Press</span><span class="meta">3 of 3 sets<br>1,010 kg</span></div>
+        <div class="ex" style="border-color:#3c4bc0; box-shadow:0 0 0 1px #3c4bc0;">
+          <div class="ex-h">Incline Dumbbell Press <small>Best 22.5 kg</small></div>
+          <div class="cols"><span></span><span>Weight</span><span>Reps</span><span>Done</span></div>
+          <div class="row"><span class="n">1</span><span class="stp"><b>−</b><i>20.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>12</i><b>+</b></span><span class="chk on">✓</span></div>
+          <div class="row"><span class="n">2</span><span class="stp"><b>−</b><i>20.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>10</i><b>+</b></span><span class="chk"></span></div>
+          <div class="row"><span class="n">3</span><span class="stp"><b>−</b><i>22.5 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>8</i><b>+</b></span><span class="chk"></span></div>
+          <div class="ex-f"><span class="add">+ Add set</span><span>Load 240 kg</span></div>
+        </div>
+        <div class="line"><span class="st"></span><span class="nm">Triceps Pushdown</span><span class="meta">0 of 3 sets</span></div>
+        <div class="line"><span class="st"></span><span class="nm">Overhead Triceps Extension</span><span class="meta">0 of 3 sets</span></div>
+        <div class="line"><span class="st"></span><span class="nm">Treadmill <span class="pr" style="background:#e3f2fd;color:#0d47a1;">cardio</span></span><span class="meta">10 min</span></div>
+        <div class="line" style="justify-content:center;color:#3c4bc0;font-weight:600;border-style:dashed;">+ Add exercise</div>
+      </div>
+      <div class="ph-fin"><div class="tot">Total load today<strong>1,250 kg</strong></div><div class="btn">Finish workout</div></div>
+      <div class="ph-nav"><div class="on"><span>●</span>Today</div><div><span>☰</span>Routines</div><div><span>◔</span>Progress</div><div><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="card-body">
+      <h3>B — One exercise at a time</h3>
+      <p>Only the exercise you are doing is open. The others show one line (for example "0 of 3 sets"). When you tick the last set, the next exercise opens by itself.</p>
+      <ul><li>Whole routine fits on one screen</li><li>One tap to open a different exercise</li></ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top:1.5rem">
+  <p class="subtitle">Also look at the five tabs at the bottom: <strong>Today · Routines · Progress · History · Profile</strong>. Tell me if you want a different set of tabs.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overload mockup: Progress, history, profile</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg-primary: #f5f5f7; --bg-secondary: #ffffff; --bg-tertiary: #e5e5e7; --border: #d1d1d6;
+          --text-primary: #1d1d1f; --text-secondary: #6e6e73; --accent: #0071e3;
+          --selected-bg: #e8f4fd; --selected-border: #0071e3; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg-primary);
+         color: var(--text-primary); line-height: 1.5; padding: 2rem; }
+  h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: .5rem; }
+  h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: .25rem; }
+  .subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
+  .section { margin-bottom: 2rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-body { padding: 1rem; }
+  .card-body p { color: var(--text-secondary); font-size: .85rem; }
+  .decision { background: #e7f6ec; border: 1px solid #9fd3b0; color: #14532d; border-radius: 10px;
+              padding: .6rem .9rem; margin-bottom: 1.25rem; font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="decision"><strong>Approved</strong> as shown. Later decision: body weight in the profile uses 0.1 kg steps.</div>
+<h2>Progress charts, history and profile</h2>
+<p class="subtitle">Five screens: (1) one exercise with its records and chart, (2) progress of one routine, (3) weekly totals, (4) history, (5) profile. In the charts the grey dots are each session and the blue line is the moving average. Look through them and tell me in the terminal what is wrong or missing.</p>
+
+<style>
+  .flow { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; align-items: flex-start; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+  .step .cap { font-size: .85rem; color: var(--text-secondary); max-width: 290px; text-align: center; }
+  .step .cap strong { color: var(--text-primary); }
+
+  .ph { width: 290px; height: 620px; border: 9px solid #18181b; border-radius: 34px; background: #f5f4fa; color: #1c1b1f;
+        overflow: hidden; display: flex; flex-direction: column; font-size: 12px; line-height: 1.35; text-align: left;
+        box-shadow: 0 10px 28px rgba(0,0,0,.28); }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 12px 13px; background: #fff; border-bottom: 1px solid #e6e4ee; font-size: 15px; font-weight: 700; }
+  .ph-body { flex: 1; overflow: hidden; padding: 9px 10px 0; display: flex; flex-direction: column; gap: 7px; }
+  .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #8a8894; margin: 2px 2px 0; }
+  .chip { border: 1px solid #c9c7d6; border-radius: 999px; padding: 3px 9px; font-size: 10.5px; color: #3c4bc0; background: #fff; white-space: nowrap; }
+  .chip.on { background: #3c4bc0; color: #fff; border-color: #3c4bc0; }
+  .chips { display: flex; gap: 5px; overflow: hidden; white-space: nowrap; }
+  .seg { display: grid; grid-template-columns: repeat(4, 1fr); background: #e7e6f0; border-radius: 10px; padding: 3px; font-size: 10.5px; text-align: center; color: #56555f; }
+  .seg span { padding: 5px 0; border-radius: 8px; }
+  .seg span.on { background: #fff; color: #1c1b1f; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .sel { background: #fff; border: 1px solid #cfcdd9; border-radius: 10px; padding: 7px 10px; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; }
+  .sel i { font-style: normal; color: #8a8894; }
+
+  .tiles { display: grid; gap: 6px; }
+  .tiles.t3 { grid-template-columns: repeat(3, 1fr); }
+  .tiles.t2 { grid-template-columns: repeat(2, 1fr); }
+  .tile { background: #fff; border: 1px solid #e3e1ec; border-radius: 11px; padding: 7px 8px; }
+  .tile small { display: block; font-size: 9.5px; color: #6b6a75; }
+  .tile b { display: block; font-size: 15px; font-weight: 650; line-height: 1.25; }
+  .tile em { display: block; font-style: normal; font-size: 9.5px; color: #8a8894; }
+
+  .chart { background: #fcfcfb; border: 1px solid #e3e1ec; border-radius: 12px; padding: 8px 8px 4px; }
+  .chart h4 { font-size: 11.5px; font-weight: 700; margin: 0 2px 2px; }
+  .chart h4 small { font-weight: 500; color: #6b6a75; }
+  .legend { display: flex; gap: 12px; font-size: 10px; color: #52514e; margin: 0 2px 2px; }
+  .legend span { display: inline-flex; align-items: center; gap: 4px; }
+  .kdot { width: 7px; height: 7px; border-radius: 50%; background: #898781; display: inline-block; }
+  .kline { width: 14px; height: 2px; background: #2a78d6; display: inline-block; border-radius: 2px; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .chart svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+  .ncontrol { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #e3e1ec; border-radius: 11px; padding: 6px 9px; font-size: 11.5px; }
+  .stp { display: flex; align-items: stretch; border: 1px solid #cfcdd9; border-radius: 9px; overflow: hidden; background: #fff; }
+  .stp b { width: 24px; text-align: center; font-weight: 700; color: #3c4bc0; background: #eceefb; padding: 4px 0; }
+  .stp i { min-width: 30px; font-style: normal; text-align: center; padding: 4px 4px; font-weight: 600; }
+  .stp i u { text-decoration: none; color: #8a8894; font-weight: 500; font-size: 10px; }
+
+  .flip { position: relative; overflow: hidden; background: #fff; flex-shrink: 0; }
+  .flip img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .flip img + img { animation: flip 2s steps(1) infinite; background: #fff; }
+  @keyframes flip { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+  .hero { height: 128px; border-bottom: 1px solid #e6e4ee; }
+
+  .line { background: #fff; border: 1px solid #e3e1ec; border-radius: 12px; padding: 7px 10px; display: flex; align-items: center; gap: 9px; }
+  .line .d { width: 34px; text-align: center; line-height: 1.1; flex-shrink: 0; }
+  .line .d b { display: block; font-size: 15px; }
+  .line .d small { font-size: 9.5px; color: #6b6a75; text-transform: uppercase; }
+  .line .nm { flex: 1; font-weight: 600; font-size: 12.5px; line-height: 1.2; }
+  .line .nm small { display: block; font-weight: 500; color: #6b6a75; font-size: 10.5px; margin-top: 1px; }
+  .line .meta { color: #1c1b1f; font-size: 12px; font-weight: 600; text-align: right; white-space: nowrap; }
+  .rec { background: #fff3cd; color: #8a5a00; border-radius: 6px; padding: 1px 6px; font-size: 9.5px; font-weight: 700; white-space: nowrap; }
+
+  .field { background: #fff; border: 1px solid #cfcdd9; border-radius: 10px; padding: 7px 10px; display: flex; justify-content: space-between; align-items: center; }
+  .field small { display: block; font-size: 9.5px; color: #8a8894; text-transform: uppercase; letter-spacing: .04em; }
+  .field div div { font-weight: 600; font-size: 13.5px; }
+  .field .note { font-size: 10.5px; color: #6b6a75; font-weight: 500; }
+  .btn2 { flex: 1; text-align: center; border: 1px solid #3c4bc0; color: #3c4bc0; border-radius: 999px; padding: 8px 6px; font-weight: 700; font-size: 11.5px; background: #fff; }
+
+  .ph-nav { display: grid; grid-template-columns: repeat(5, 1fr); background: #eeedf6; border-top: 1px solid #e0deea; padding: 7px 2px 9px; }
+  .ph-nav div { text-align: center; font-size: 9px; color: #6b6a75; }
+  .ph-nav div span { display: block; font-size: 14px; line-height: 1.2; }
+  .ph-nav div.on { color: #3c4bc0; font-weight: 700; }
+</style>
+
+<div class="flow">
+
+  <!-- 1. EXERCISE DETAIL -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar"><span>←</span>Bench Press</div>
+      <div class="flip hero"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg" alt=""></div>
+      <div class="ph-body">
+        <div class="lbl">Chest · barbell · my records</div>
+        <div class="tiles t3">
+          <div class="tile"><small>Max weight</small><b>45 kg</b><em>5 Nov</em></div>
+          <div class="tile"><small>Best set</small><b>340 kg</b><em>42.5 × 8</em></div>
+          <div class="tile"><small>Best session</small><b>1,010 kg</b><em>5 Nov</em></div>
+        </div>
+        <div class="chips"><span class="chip on">All routines</span><span class="chip">Chest + Triceps</span><span class="chip">Full Body</span></div>
+        <div class="chart">
+          <h4>Load per session <small>(kg)</small></h4>
+          <div class="legend"><span><i class="kdot"></i>Each session</span><span><i class="kline"></i>Average of last 10</span></div>
+          <svg viewBox="0 0 262 126" role="img" aria-label="Bench Press load per session with moving average, rising from 720 to about 1,000 kg">
+            <g stroke="#e1e0d9" stroke-width="1"><line x1="32" x2="228" y1="29" y2="29"/><line x1="32" x2="228" y1="67" y2="67"/></g>
+            <line x1="32" x2="228" y1="105" y2="105" stroke="#c3c2b7" stroke-width="1"/>
+            <g font-size="8.5" fill="#898781" text-anchor="end"><text x="27" y="32">1,000</text><text x="27" y="70">800</text><text x="27" y="108">600</text></g>
+            <polyline fill="none" stroke="#c3c2b7" stroke-width="1.5" stroke-linejoin="round" points="32,82.2 47.1,74.6 62.2,78.4 77.2,67 92.3,70.8 107.4,59.4 122.5,63.2 137.5,51.8 152.6,55.6 167.7,48 182.8,40.4 197.8,44.2 212.9,27.1 228,32.8"/>
+            <g fill="#898781" stroke="#fcfcfb" stroke-width="1.5">
+              <circle cx="32" cy="82.2" r="3"><title>28 Sep: 720 kg</title></circle><circle cx="47.1" cy="74.6" r="3"><title>1 Oct: 760 kg</title></circle>
+              <circle cx="62.2" cy="78.4" r="3"><title>5 Oct: 740 kg</title></circle><circle cx="77.2" cy="67" r="3"><title>8 Oct: 800 kg</title></circle>
+              <circle cx="92.3" cy="70.8" r="3"><title>12 Oct: 780 kg</title></circle><circle cx="107.4" cy="59.4" r="3"><title>15 Oct: 840 kg</title></circle>
+              <circle cx="122.5" cy="63.2" r="3"><title>19 Oct: 820 kg</title></circle><circle cx="137.5" cy="51.8" r="3"><title>22 Oct: 880 kg</title></circle>
+              <circle cx="152.6" cy="55.6" r="3"><title>26 Oct: 860 kg</title></circle><circle cx="167.7" cy="48" r="3"><title>29 Oct: 900 kg</title></circle>
+              <circle cx="182.8" cy="40.4" r="3"><title>2 Nov: 940 kg</title></circle><circle cx="197.8" cy="44.2" r="3"><title>4 Nov: 920 kg</title></circle>
+              <circle cx="212.9" cy="27.1" r="3"><title>5 Nov: 1,010 kg</title></circle><circle cx="228" cy="32.8" r="3"><title>9 Nov: 980 kg</title></circle>
+            </g>
+            <polyline fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="32,82.2 47.1,78.4 62.2,78.4 77.2,75.6 92.3,74.6 107.4,72.1 122.5,70.8 137.5,68.4 152.6,67 167.7,65.1 182.8,60.9 197.8,57.9 212.9,52.8 228,49.3"/>
+            <circle cx="228" cy="49.3" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>Average of last 10 sessions: 893 kg</title></circle>
+            <text x="235" y="52.5" font-size="9" font-weight="600" fill="#0b0b0b">893</text>
+            <g font-size="8.5" fill="#898781"><text x="32" y="119">28 Sep</text><text x="130" y="119" text-anchor="middle">19 Oct</text><text x="228" y="119" text-anchor="end">9 Nov</text></g>
+          </svg>
+        </div>
+        <div class="ncontrol"><span>Average of last</span><span class="stp"><b>−</b><i>10</i><b>+</b></span><span>sessions</span></div>
+      </div>
+    </div>
+    <div class="cap"><strong>1. One exercise</strong><br>Opens when you tap an exercise picture, or from Progress. Shows the three records, the chart, a routine filter and the "last N sessions" control.</div>
+  </div>
+
+  <!-- 2. PROGRESS: ROUTINE -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar">Progress</div>
+      <div class="ph-body">
+        <div class="seg"><span>Exercises</span><span class="on">Routines</span><span>Weekly</span><span>Body</span></div>
+        <div class="sel"><span>Chest + Triceps</span><i>▾</i></div>
+        <div class="tiles t2">
+          <div class="tile"><small>Best session</small><b>4,820 kg</b><em>5 Nov</em></div>
+          <div class="tile"><small>Last session</small><b>4,650 kg</b><em>9 Nov</em></div>
+        </div>
+        <div class="chart">
+          <h4>Load per session <small>(kg)</small></h4>
+          <div class="legend"><span><i class="kdot"></i>Each session</span><span><i class="kline"></i>Average of last 10</span></div>
+          <svg viewBox="0 0 262 126" role="img" aria-label="Chest plus Triceps routine load per session with moving average, rising from 4,100 to about 4,650 kg">
+            <g stroke="#e1e0d9" stroke-width="1"><line x1="36" x2="228" y1="10" y2="10"/><line x1="36" x2="228" y1="57.5" y2="57.5"/></g>
+            <line x1="36" x2="228" y1="105" y2="105" stroke="#c3c2b7" stroke-width="1"/>
+            <g font-size="8.5" fill="#898781" text-anchor="end"><text x="31" y="13">5,000</text><text x="31" y="60.5">4,500</text><text x="31" y="108">4,000</text></g>
+            <polyline fill="none" stroke="#c3c2b7" stroke-width="1.5" stroke-linejoin="round" points="36,95.5 57.3,81.3 78.7,87.9 100,67 121.3,71.8 142.7,55.6 164,59.4 185.3,43.3 206.7,27.1 228,43.3"/>
+            <g fill="#898781" stroke="#fcfcfb" stroke-width="1.5">
+              <circle cx="36" cy="95.5" r="3"><title>8 Oct: 4,100 kg</title></circle><circle cx="57.3" cy="81.3" r="3"><title>12 Oct: 4,250 kg</title></circle>
+              <circle cx="78.7" cy="87.9" r="3"><title>15 Oct: 4,180 kg</title></circle><circle cx="100" cy="67" r="3"><title>19 Oct: 4,400 kg</title></circle>
+              <circle cx="121.3" cy="71.8" r="3"><title>22 Oct: 4,350 kg</title></circle><circle cx="142.7" cy="55.6" r="3"><title>26 Oct: 4,520 kg</title></circle>
+              <circle cx="164" cy="59.4" r="3"><title>29 Oct: 4,480 kg</title></circle><circle cx="185.3" cy="43.3" r="3"><title>2 Nov: 4,650 kg</title></circle>
+              <circle cx="206.7" cy="27.1" r="3"><title>5 Nov: 4,820 kg</title></circle><circle cx="228" cy="43.3" r="3"><title>9 Nov: 4,650 kg</title></circle>
+            </g>
+            <polyline fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="36,95.5 57.3,88.4 78.7,88.2 100,82.9 121.3,80.7 142.7,76.5 164,74.1 185.3,70.2 206.7,65.4 228,63.2"/>
+            <circle cx="228" cy="63.2" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>Average of last 10 sessions: 4,440 kg</title></circle>
+            <text x="234" y="66.5" font-size="9" font-weight="600" fill="#0b0b0b">4,440</text>
+            <g font-size="8.5" fill="#898781"><text x="36" y="119">8 Oct</text><text x="132" y="119" text-anchor="middle">24 Oct</text><text x="228" y="119" text-anchor="end">9 Nov</text></g>
+          </svg>
+        </div>
+        <div class="ncontrol"><span>Average of last</span><span class="stp"><b>−</b><i>10</i><b>+</b></span><span>sessions</span></div>
+        <div class="lbl">Exercises in this routine</div>
+        <div class="line"><span class="nm">Bench Press<small>Max 45 kg · best session 1,010 kg</small></span><span style="color:#8a8894">›</span></div>
+        <div class="line"><span class="nm">Incline Dumbbell Press<small>Max 22.5 kg · best session 720 kg</small></span><span style="color:#8a8894">›</span></div>
+      </div>
+      <div class="ph-nav"><div><span>●</span>Today</div><div><span>☰</span>Routines</div><div class="on"><span>◔</span>Progress</div><div><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="cap"><strong>2. Progress → Routines</strong><br>Pick a routine to see its load each time you did it, its best session, and its exercises.</div>
+  </div>
+
+  <!-- 3. PROGRESS: WEEKLY -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar">Progress</div>
+      <div class="ph-body">
+        <div class="seg"><span>Exercises</span><span>Routines</span><span class="on">Weekly</span><span>Body</span></div>
+        <div class="tiles t2">
+          <div class="tile"><small>This week so far</small><b>9,300 kg</b><em>3 workouts</em></div>
+          <div class="tile"><small>Best week</small><b>17,200 kg</b><em>2 – 8 Nov</em></div>
+        </div>
+        <div class="chart">
+          <h4>Total load per week <small>(kg)</small></h4>
+          <svg viewBox="0 0 262 126" role="img" aria-label="Total load per week for the last 8 weeks, between 13,800 and 17,200 kg, current week 9,300 so far">
+            <g stroke="#e1e0d9" stroke-width="1"><line x1="34" x2="250" y1="12" y2="12"/><line x1="34" x2="250" y1="56" y2="56"/></g>
+            <g font-size="8.5" fill="#898781" text-anchor="end"><text x="29" y="15">20K</text><text x="29" y="59">10K</text><text x="29" y="103">0</text></g>
+            <g fill="#2a78d6">
+              <path d="M39.5,100V41.5Q39.5,37.5 43.5,37.5H51.5Q55.5,37.5 55.5,41.5V100Z"><title>Week of 21 Sep: 14,200 kg</title></path>
+              <path d="M66.5,100V37.6Q66.5,33.6 70.5,33.6H78.5Q82.5,33.6 82.5,37.6V100Z"><title>Week of 28 Sep: 15,100 kg</title></path>
+              <path d="M93.5,100V43.3Q93.5,39.3 97.5,39.3H105.5Q109.5,39.3 109.5,43.3V100Z"><title>Week of 5 Oct: 13,800 kg</title></path>
+              <path d="M120.5,100V34Q120.5,30 124.5,30H132.5Q136.5,30 136.5,34V100Z"><title>Week of 12 Oct: 15,900 kg</title></path>
+              <path d="M147.5,100V31.8Q147.5,27.8 151.5,27.8H159.5Q163.5,27.8 163.5,31.8V100Z"><title>Week of 19 Oct: 16,400 kg</title></path>
+              <path d="M174.5,100V35.4Q174.5,31.4 178.5,31.4H186.5Q190.5,31.4 190.5,35.4V100Z"><title>Week of 26 Oct: 15,600 kg</title></path>
+              <path d="M201.5,100V28.3Q201.5,24.3 205.5,24.3H213.5Q217.5,24.3 217.5,28.3V100Z"><title>Week of 2 Nov: 17,200 kg</title></path>
+            </g>
+            <path fill="#86b6ef" d="M228.5,100V63.1Q228.5,59.1 232.5,59.1H240.5Q244.5,59.1 244.5,63.1V100Z"><title>This week so far: 9,300 kg</title></path>
+            <line x1="34" x2="250" y1="100" y2="100" stroke="#c3c2b7" stroke-width="1"/>
+            <text x="209.5" y="20" font-size="9" font-weight="600" fill="#0b0b0b" text-anchor="middle">17.2K</text>
+            <text x="236.5" y="55" font-size="8.5" fill="#52514e" text-anchor="middle">so far</text>
+            <g font-size="8.5" fill="#898781" text-anchor="middle"><text x="47.5" y="114">21 Sep</text><text x="128.5" y="114">12 Oct</text><text x="209.5" y="114">2 Nov</text></g>
+          </svg>
+        </div>
+        <div class="chart">
+          <h4>Cardio per week <small>(minutes)</small></h4>
+          <svg viewBox="0 0 262 96" role="img" aria-label="Cardio minutes per week for the last 8 weeks, between 20 and 50 minutes">
+            <g stroke="#e1e0d9" stroke-width="1"><line x1="34" x2="250" y1="12" y2="12"/><line x1="34" x2="250" y1="42" y2="42"/></g>
+            <g font-size="8.5" fill="#898781" text-anchor="end"><text x="29" y="15">60</text><text x="29" y="45">30</text><text x="29" y="75">0</text></g>
+            <g fill="#eb6834">
+              <path d="M39.5,72V46Q39.5,42 43.5,42H51.5Q55.5,42 55.5,46V72Z"><title>Week of 21 Sep: 30 min</title></path>
+              <path d="M66.5,72V31Q66.5,27 70.5,27H78.5Q82.5,27 82.5,31V72Z"><title>Week of 28 Sep: 45 min</title></path>
+              <path d="M93.5,72V56Q93.5,52 97.5,52H105.5Q109.5,52 109.5,56V72Z"><title>Week of 5 Oct: 20 min</title></path>
+              <path d="M120.5,72V36Q120.5,32 124.5,32H132.5Q136.5,32 136.5,36V72Z"><title>Week of 12 Oct: 40 min</title></path>
+              <path d="M147.5,72V26Q147.5,22 151.5,22H159.5Q163.5,22 163.5,26V72Z"><title>Week of 19 Oct: 50 min</title></path>
+              <path d="M174.5,72V41Q174.5,37 178.5,37H186.5Q190.5,37 190.5,41V72Z"><title>Week of 26 Oct: 35 min</title></path>
+              <path d="M201.5,72V31Q201.5,27 205.5,27H213.5Q217.5,27 217.5,31V72Z"><title>Week of 2 Nov: 45 min</title></path>
+              <path d="M228.5,72V56Q228.5,52 232.5,52H240.5Q244.5,52 244.5,56V72Z"><title>This week so far: 20 min</title></path>
+            </g>
+            <line x1="34" x2="250" y1="72" y2="72" stroke="#c3c2b7" stroke-width="1"/>
+            <text x="155.5" y="18" font-size="9" font-weight="600" fill="#0b0b0b" text-anchor="middle">50</text>
+            <g font-size="8.5" fill="#898781" text-anchor="middle"><text x="47.5" y="86">21 Sep</text><text x="128.5" y="86">12 Oct</text><text x="209.5" y="86">2 Nov</text></g>
+          </svg>
+        </div>
+      </div>
+      <div class="ph-nav"><div><span>●</span>Today</div><div><span>☰</span>Routines</div><div class="on"><span>◔</span>Progress</div><div><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="cap"><strong>3. Progress → Weekly</strong><br>All routines added together for each week, plus cardio minutes. The "Body" tab next to it shows your body weight over time.</div>
+  </div>
+
+  <!-- 4. HISTORY -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar">History</div>
+      <div class="ph-body">
+        <div class="lbl">November 2026</div>
+        <div class="line"><span class="d"><b>11</b><small>Wed</small></span><span class="nm">Leg + Shoulder<small>6 exercises · 18 sets</small></span><span class="meta">6,240 kg</span></div>
+        <div class="line"><span class="d"><b>10</b><small>Tue</small></span><span class="nm">Back + Biceps <span class="rec">1 record</span><small>5 exercises · 15 sets</small></span><span class="meta">5,480 kg</span></div>
+        <div class="line"><span class="d"><b>9</b><small>Mon</small></span><span class="nm">Chest + Triceps<small>5 exercises · 12 sets</small></span><span class="meta">4,650 kg</span></div>
+        <div class="line"><span class="d"><b>7</b><small>Sat</small></span><span class="nm">Cardio<small>2 exercises</small></span><span class="meta">35 min</span></div>
+        <div class="line"><span class="d"><b>6</b><small>Fri</small></span><span class="nm">Full Body<small>7 exercises · 21 sets</small></span><span class="meta">7,120 kg</span></div>
+        <div class="line"><span class="d"><b>5</b><small>Thu</small></span><span class="nm">Chest + Triceps <span class="rec">2 records</span><small>5 exercises · 13 sets</small></span><span class="meta">4,820 kg</span></div>
+        <div class="line"><span class="d"><b>4</b><small>Wed</small></span><span class="nm">Leg + Shoulder<small>6 exercises · 17 sets</small></span><span class="meta">6,100 kg</span></div>
+        <div class="line"><span class="d"><b>3</b><small>Tue</small></span><span class="nm">Back + Biceps<small>5 exercises · 15 sets</small></span><span class="meta">5,310 kg</span></div>
+        <div class="line"><span class="d"><b>2</b><small>Mon</small></span><span class="nm">Chest + Triceps<small>5 exercises · 12 sets</small></span><span class="meta">4,650 kg</span></div>
+      </div>
+      <div class="ph-nav"><div><span>●</span>Today</div><div><span>☰</span>Routines</div><div><span>◔</span>Progress</div><div class="on"><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="cap"><strong>4. History</strong><br>Every saved workout, newest first. Tap one to see all its sets and fix a wrong weight or reps.</div>
+  </div>
+
+  <!-- 5. PROFILE -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar">Profile</div>
+      <div class="ph-body">
+        <div class="field"><div><small>Name</small><div>Sam</div></div></div>
+        <div class="field"><div><small>Date of birth</small><div>14 March 1996</div></div><span class="note">30 years</span></div>
+        <div class="field"><div><small>Height</small><div>5 ft 9 in</div></div><span class="note">feet and inches</span></div>
+        <div class="field"><div><small>Body weight</small><div>72.5 kg</div></div><span class="stp"><b>−</b><i>0.5 <u>kg</u></i><b>+</b></span></div>
+        <div class="chart">
+          <h4>Body weight <small>(kg)</small></h4>
+          <svg viewBox="0 0 262 96" role="img" aria-label="Body weight over time, from 74.5 kg down to 72.5 kg">
+            <g stroke="#e1e0d9" stroke-width="1"><line x1="34" x2="228" y1="14" y2="14"/><line x1="34" x2="228" y1="43" y2="43"/></g>
+            <line x1="34" x2="228" y1="72" y2="72" stroke="#c3c2b7" stroke-width="1"/>
+            <g font-size="8.5" fill="#898781" text-anchor="end"><text x="29" y="17">76</text><text x="29" y="46">74</text><text x="29" y="75">72</text></g>
+            <path fill="#2a78d6" fill-opacity=".1" d="M34,35.8 L66.3,43 L98.7,39.4 L131,50.3 L163.3,54.6 L195.7,57.5 L228,64.8 V72 H34 Z"/>
+            <polyline fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="34,35.8 66.3,43 98.7,39.4 131,50.3 163.3,54.6 195.7,57.5 228,64.8"/>
+            <circle cx="228" cy="64.8" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>10 Nov: 72.5 kg</title></circle>
+            <text x="235" y="68" font-size="9" font-weight="600" fill="#0b0b0b">72.5</text>
+            <g font-size="8.5" fill="#898781"><text x="34" y="86">Aug</text><text x="228" y="86" text-anchor="end">Nov</text></g>
+          </svg>
+        </div>
+        <div class="lbl">Backup</div>
+        <div style="display:flex; gap:7px;"><span class="btn2">Export backup file</span><span class="btn2">Import backup file</span></div>
+      </div>
+      <div class="ph-nav"><div><span>●</span>Today</div><div><span>☰</span>Routines</div><div><span>◔</span>Progress</div><div><span>▤</span>History</div><div class="on"><span>☺</span>Profile</div></div>
+    </div>
+    <div class="cap"><strong>5. Profile</strong><br>Name, date of birth, height in feet and inches, body weight in kg, and backup. Each body weight change is saved with its date.</div>
+  </div>
+
+</div>
+
+</body>
+</html>

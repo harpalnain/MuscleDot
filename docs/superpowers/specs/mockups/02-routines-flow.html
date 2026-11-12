@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overload mockup: Routines, schedule, adding exercises</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg-primary: #f5f5f7; --bg-secondary: #ffffff; --bg-tertiary: #e5e5e7; --border: #d1d1d6;
+          --text-primary: #1d1d1f; --text-secondary: #6e6e73; --accent: #0071e3;
+          --selected-bg: #e8f4fd; --selected-border: #0071e3; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg-primary);
+         color: var(--text-primary); line-height: 1.5; padding: 2rem; }
+  h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: .5rem; }
+  h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: .25rem; }
+  .subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
+  .section { margin-bottom: 2rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-body { padding: 1rem; }
+  .card-body p { color: var(--text-secondary); font-size: .85rem; }
+  .decision { background: #e7f6ec; border: 1px solid #9fd3b0; color: #14532d; border-radius: 10px;
+              padding: .6rem .9rem; margin-bottom: 1.25rem; font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="decision"><strong>Approved</strong> as shown.</div>
+<h2>Routines, weekly schedule and adding exercises</h2>
+<p class="subtitle">Four screens, left to right: (1) Today with the picture, in the layout you picked, (2) the Routines tab with your week and your routines, (3) editing one routine, (4) searching and adding an exercise. The pictures switch between start and end position like a simple GIF. Look through them and tell me in the terminal what is wrong or missing.</p>
+
+<style>
+  .flow { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; align-items: flex-start; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+  .step .cap { font-size: .85rem; color: var(--text-secondary); max-width: 290px; text-align: center; }
+  .step .cap strong { color: var(--text-primary); }
+
+  .ph { width: 290px; height: 620px; border: 9px solid #18181b; border-radius: 34px; background: #f5f4fa; color: #1c1b1f;
+        overflow: hidden; display: flex; flex-direction: column; font-size: 12px; line-height: 1.35; text-align: left;
+        box-shadow: 0 10px 28px rgba(0,0,0,.28); }
+  .ph-top { padding: 13px 13px 10px; background: #fff; border-bottom: 1px solid #e6e4ee; }
+  .ph-date { color: #6b6a75; font-size: 11px; }
+  .ph-title { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+  .ph-title .name { font-size: 18px; font-weight: 700; }
+  .chip { border: 1px solid #c9c7d6; border-radius: 999px; padding: 3px 9px; font-size: 10.5px; color: #3c4bc0; background: #fff; white-space: nowrap; }
+  .chip.on { background: #3c4bc0; color: #fff; border-color: #3c4bc0; }
+  .week { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: #6b6a75; font-size: 11px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #d9d7e3; display: inline-block; }
+  .dot.on { background: #2e9e5b; }
+  .bar { display: flex; align-items: center; gap: 10px; padding: 13px; background: #fff; border-bottom: 1px solid #e6e4ee; font-size: 15px; font-weight: 700; }
+  .bar .sp { flex: 1; }
+  .bar .act { color: #3c4bc0; font-size: 12.5px; }
+
+  .ph-body { flex: 1; overflow: hidden; padding: 10px 10px 0; display: flex; flex-direction: column; gap: 7px; }
+  .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #8a8894; margin: 3px 2px 0; }
+  .ex { background: #fff; border: 1px solid #3c4bc0; box-shadow: 0 0 0 1px #3c4bc0; border-radius: 14px; padding: 9px 9px 7px; }
+  .ex-h { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+  .ex-h .t { flex: 1; font-weight: 700; font-size: 13px; line-height: 1.2; }
+  .ex-h .t small { display: block; font-weight: 500; color: #6b6a75; font-size: 10.5px; margin-top: 2px; }
+  .cols, .row { display: grid; grid-template-columns: 16px 1fr 1fr 26px; align-items: center; column-gap: 7px; }
+  .cols { color: #8a8894; font-size: 9.5px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
+  .row { margin-bottom: 5px; }
+  .row .n { color: #6b6a75; font-weight: 600; text-align: center; }
+  .stp { display: flex; align-items: stretch; border: 1px solid #cfcdd9; border-radius: 9px; overflow: hidden; background: #fff; }
+  .stp b { width: 22px; text-align: center; font-weight: 700; color: #3c4bc0; background: #eceefb; padding: 4px 0; }
+  .stp i { flex: 1; font-style: normal; text-align: center; padding: 4px 1px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .stp i u { text-decoration: none; color: #8a8894; font-weight: 500; font-size: 10px; }
+  .chk { width: 25px; height: 25px; border-radius: 8px; border: 2px solid #b9b7c6; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; }
+  .chk.on { background: #2e9e5b; border-color: #2e9e5b; }
+  .ex-f { display: flex; justify-content: space-between; color: #6b6a75; font-size: 11px; margin-top: 2px; }
+  .ex-f .add { color: #3c4bc0; font-weight: 600; }
+
+  .line { background: #fff; border: 1px solid #e3e1ec; border-radius: 12px; padding: 8px 9px; display: flex; align-items: center; gap: 9px; }
+  .line .st { width: 21px; height: 21px; border-radius: 50%; border: 2px solid #b9b7c6; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 800; flex-shrink: 0; }
+  .line .st.on { background: #2e9e5b; border-color: #2e9e5b; }
+  .line .nm { flex: 1; font-weight: 600; font-size: 12.5px; line-height: 1.2; }
+  .line .nm small { display: block; font-weight: 500; color: #6b6a75; font-size: 10.5px; margin-top: 1px; }
+  .line .meta { color: #6b6a75; font-size: 10.5px; text-align: right; }
+  .line .ico { color: #8a8894; font-size: 15px; }
+  .line .plus { width: 24px; height: 24px; border-radius: 50%; background: #eceefb; color: #3c4bc0; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .dashed { justify-content: center; color: #3c4bc0; font-weight: 600; border-style: dashed; }
+  .tag { border-radius: 6px; padding: 1px 6px; font-size: 9.5px; font-weight: 700; background: #e3f2fd; color: #0d47a1; }
+
+  .day { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 6px; background: #fff; border: 1px solid #e3e1ec; border-radius: 10px; padding: 5px 9px; }
+  .day b { font-size: 11px; color: #6b6a75; }
+  .day span { font-weight: 600; }
+  .day i { font-style: normal; color: #8a8894; }
+  .day.rest span { color: #8a8894; font-weight: 500; }
+  .day.today { border-color: #3c4bc0; background: #f1f2fd; }
+  .day.today b { color: #3c4bc0; }
+
+  .field { background: #fff; border: 1px solid #cfcdd9; border-radius: 10px; padding: 8px 10px; }
+  .field small { display: block; font-size: 9.5px; color: #8a8894; text-transform: uppercase; letter-spacing: .04em; }
+  .field div { font-weight: 600; font-size: 13.5px; }
+  .search { background: #fff; border: 1px solid #3c4bc0; border-radius: 999px; padding: 8px 12px; font-size: 12.5px; }
+  .chips { display: flex; gap: 5px; overflow: hidden; white-space: nowrap; }
+
+  .flip { position: relative; overflow: hidden; background: #fff; border-radius: 9px; border: 1px solid #e3e1ec; flex-shrink: 0; }
+  .flip img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .flip img + img { animation: flip 2s steps(1) infinite; }
+  @keyframes flip { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+  .f52 { width: 54px; height: 54px; }
+  .f40 { width: 40px; height: 40px; }
+  .f34 { width: 34px; height: 34px; }
+
+  .ph-fin { display: flex; align-items: center; justify-content: space-between; padding: 8px 11px; background: #fff; border-top: 1px solid #e6e4ee; }
+  .ph-fin .tot { font-size: 10.5px; color: #6b6a75; }
+  .ph-fin .tot strong { display: block; font-size: 14.5px; color: #1c1b1f; }
+  .btn { background: #3c4bc0; color: #fff; border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: 12px; }
+  .ph-nav { display: grid; grid-template-columns: repeat(5, 1fr); background: #eeedf6; border-top: 1px solid #e0deea; padding: 7px 2px 9px; }
+  .ph-nav div { text-align: center; font-size: 9px; color: #6b6a75; }
+  .ph-nav div span { display: block; font-size: 14px; line-height: 1.2; }
+  .ph-nav div.on { color: #3c4bc0; font-weight: 700; }
+</style>
+
+<div class="flow">
+
+  <!-- 1. TODAY -->
+  <div class="step">
+    <div class="ph">
+      <div class="ph-top">
+        <div class="ph-date">Thursday, 12 November</div>
+        <div class="ph-title"><div class="name">Chest + Triceps</div><div class="chip">Change routine</div></div>
+        <div class="week">This week: 3 of 5 done <span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+      <div class="ph-body">
+        <div class="line"><span class="st on">✓</span><span class="nm">Bench Press</span><span class="meta">3 of 3 sets<br>1,010 kg</span></div>
+        <div class="ex">
+          <div class="ex-h">
+            <div class="flip f52"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/1.jpg" alt=""></div>
+            <div class="t">Incline Dumbbell Press<small>Best 22.5 kg · tap picture for details</small></div>
+          </div>
+          <div class="cols"><span></span><span>Weight</span><span>Reps</span><span>Done</span></div>
+          <div class="row"><span class="n">1</span><span class="stp"><b>−</b><i>20.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>12</i><b>+</b></span><span class="chk on">✓</span></div>
+          <div class="row"><span class="n">2</span><span class="stp"><b>−</b><i>20.0 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>10</i><b>+</b></span><span class="chk"></span></div>
+          <div class="row"><span class="n">3</span><span class="stp"><b>−</b><i>22.5 <u>kg</u></i><b>+</b></span><span class="stp"><b>−</b><i>8</i><b>+</b></span><span class="chk"></span></div>
+          <div class="ex-f"><span class="add">+ Add set</span><span>Load 240 kg</span></div>
+        </div>
+        <div class="line"><span class="st"></span><span class="nm">Triceps Pushdown</span><span class="meta">0 of 3 sets</span></div>
+        <div class="line"><span class="st"></span><span class="nm">Overhead Triceps Extension</span><span class="meta">0 of 3 sets</span></div>
+        <div class="line"><span class="st"></span><span class="nm">Treadmill <span class="tag">cardio</span></span><span class="meta">10 min</span></div>
+        <div class="line dashed">+ Add exercise</div>
+      </div>
+      <div class="ph-fin"><div class="tot">Total load today<strong>1,250 kg</strong></div><div class="btn">Finish workout</div></div>
+      <div class="ph-nav"><div class="on"><span>●</span>Today</div><div><span>☰</span>Routines</div><div><span>◔</span>Progress</div><div><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="cap"><strong>1. Today</strong><br>The open exercise shows its picture. Tap the picture for the big view, records and chart.</div>
+  </div>
+
+  <!-- 2. ROUTINES TAB -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar">Routines</div>
+      <div class="ph-body">
+        <div class="lbl">My week — tap a day to change it</div>
+        <div class="day"><b>Mon</b><span>Chest + Triceps</span><i>▾</i></div>
+        <div class="day"><b>Tue</b><span>Back + Biceps</span><i>▾</i></div>
+        <div class="day"><b>Wed</b><span>Leg + Shoulder</span><i>▾</i></div>
+        <div class="day today"><b>Thu</b><span>Chest + Triceps</span><i>▾</i></div>
+        <div class="day"><b>Fri</b><span>Full Body</span><i>▾</i></div>
+        <div class="day"><b>Sat</b><span>Cardio</span><i>▾</i></div>
+        <div class="day rest"><b>Sun</b><span>Rest day</span><i>▾</i></div>
+        <div class="lbl" style="margin-top:6px">My routines</div>
+        <div class="line"><span class="nm">Full Body<small>7 exercises</small></span><span class="ico">⋮</span></div>
+        <div class="line"><span class="nm">Chest + Triceps<small>5 exercises</small></span><span class="ico">⋮</span></div>
+        <div class="line"><span class="nm">Back + Biceps<small>5 exercises</small></span><span class="ico">⋮</span></div>
+        <div class="line"><span class="nm">Leg + Shoulder<small>6 exercises</small></span><span class="ico">⋮</span></div>
+        <div class="line dashed">+ New routine</div>
+      </div>
+      <div class="ph-nav"><div><span>●</span>Today</div><div class="on"><span>☰</span>Routines</div><div><span>◔</span>Progress</div><div><span>▤</span>History</div><div><span>☺</span>Profile</div></div>
+    </div>
+    <div class="cap"><strong>2. Routines tab</strong><br>Top: which routine is on which day. Bottom: all your routines. The ⋮ menu has Edit, Duplicate and Delete.</div>
+  </div>
+
+  <!-- 3. ROUTINE EDITOR -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar"><span>←</span>Edit routine<span class="sp"></span><span class="act">Save</span></div>
+      <div class="ph-body">
+        <div class="field"><small>Routine name</small><div>Chest + Triceps</div></div>
+        <div class="lbl">Exercises — hold and drag to reorder</div>
+        <div class="line"><span class="ico">≡</span>
+          <div class="flip f34"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg" alt=""></div>
+          <span class="nm">Bench Press<small>3 sets · 40 kg × 10</small></span><span class="ico">✕</span></div>
+        <div class="line"><span class="ico">≡</span>
+          <div class="flip f34"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/1.jpg" alt=""></div>
+          <span class="nm">Incline Dumbbell Press<small>3 sets · 20 kg × 12</small></span><span class="ico">✕</span></div>
+        <div class="line"><span class="ico">≡</span>
+          <div class="flip f34"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/1.jpg" alt=""></div>
+          <span class="nm">Triceps Pushdown<small>3 sets · 25 kg × 12</small></span><span class="ico">✕</span></div>
+        <div class="line"><span class="ico">≡</span>
+          <div class="flip f34"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Rope_Overhead_Triceps_Extension/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Rope_Overhead_Triceps_Extension/1.jpg" alt=""></div>
+          <span class="nm">Overhead Triceps Extension<small>3 sets · 15 kg × 12</small></span><span class="ico">✕</span></div>
+        <div class="line"><span class="ico">≡</span>
+          <div class="flip f34"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Running_Treadmill/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Running_Treadmill/1.jpg" alt=""></div>
+          <span class="nm">Treadmill <span class="tag">cardio</span><small>10 min</small></span><span class="ico">✕</span></div>
+        <div class="line dashed">+ Add exercise</div>
+      </div>
+    </div>
+    <div class="cap"><strong>3. Edit a routine</strong><br>Rename, reorder, remove, add. Tap an exercise to set its starting sets, reps and weight.</div>
+  </div>
+
+  <!-- 4. EXERCISE PICKER -->
+  <div class="step">
+    <div class="ph">
+      <div class="bar"><span>←</span>Add exercise</div>
+      <div class="ph-body">
+        <div class="search">🔍 press</div>
+        <div class="chips"><span class="chip on">All</span><span class="chip">Chest</span><span class="chip">Back</span><span class="chip">Legs</span><span class="chip">Shoulders</span><span class="chip">Arms</span></div>
+        <div class="line">
+          <div class="flip f40"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg" alt=""></div>
+          <span class="nm">Bench Press<small>Chest · barbell</small></span><span class="plus">+</span></div>
+        <div class="line">
+          <div class="flip f40"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/1.jpg" alt=""></div>
+          <span class="nm">Incline Dumbbell Press<small>Chest · dumbbell</small></span><span class="plus">+</span></div>
+        <div class="line">
+          <div class="flip f40"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shoulder_Press/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Shoulder_Press/1.jpg" alt=""></div>
+          <span class="nm">Dumbbell Shoulder Press<small>Shoulders · dumbbell</small></span><span class="plus">+</span></div>
+        <div class="line">
+          <div class="flip f40"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Leg_Press/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Leg_Press/1.jpg" alt=""></div>
+          <span class="nm">Leg Press<small>Legs · machine</small></span><span class="plus">+</span></div>
+        <div class="line">
+          <div class="flip f40"><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pushups/0.jpg" alt=""><img src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pushups/1.jpg" alt=""></div>
+          <span class="nm">Push-up <span class="tag" style="background:#e8f5e9;color:#1b5e20;">body weight</span><small>Chest · no equipment</small></span><span class="plus">+</span></div>
+        <div class="line dashed">+ Create "press" as my own exercise</div>
+      </div>
+    </div>
+    <div class="cap"><strong>4. Add exercise</strong><br>Type to search, or filter by muscle. If it is not in the list, create your own.</div>
+  </div>
+
+</div>
+
+</body>
+</html>
