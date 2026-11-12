@@ -39,9 +39,11 @@ import androidx.navigation.toRoute
 import com.example.fit.R
 import com.example.fit.ui.appContainer
 import com.example.fit.ui.components.LocalFlipFrame
+import com.example.fit.ui.exercise.ExerciseDetailScreen
 import com.example.fit.ui.picker.ExercisePickerScreen
 import com.example.fit.ui.profile.ProfileScreen
 import com.example.fit.ui.profile.WelcomeScreen
+import com.example.fit.ui.progress.ProgressScreen
 import com.example.fit.ui.routines.RoutineEditorScreen
 import com.example.fit.ui.routines.RoutinesScreen
 import com.example.fit.ui.today.TodayScreen
@@ -112,7 +114,9 @@ fun AppNav() {
                 composable<RoutinesRoute> {
                     RoutinesScreen(onEdit = { navController.navigate(RoutineEditorRoute(it)) })
                 }
-                composable<ProgressRoute> { Placeholder("screen-progress") }
+                composable<ProgressRoute> {
+                    ProgressScreen(onShowExercise = { navController.navigate(ExerciseDetailRoute(it)) })
+                }
                 composable<HistoryRoute> { Placeholder("screen-history") }
                 composable<ProfileRoute> { ProfileScreen() }
                 composable<RoutineEditorRoute> { entry ->
@@ -138,7 +142,12 @@ fun AppNav() {
                         onBack = { navController.popBackStack() },
                     )
                 }
-                composable<ExerciseDetailRoute> { Placeholder("screen-exercise-detail") }
+                composable<ExerciseDetailRoute> { entry ->
+                    ExerciseDetailScreen(
+                        exerciseId = entry.toRoute<ExerciseDetailRoute>().exerciseId,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
                 composable<WorkoutDetailRoute> { Placeholder("screen-workout-detail") }
             }
         }

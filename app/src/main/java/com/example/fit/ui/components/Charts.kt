@@ -98,6 +98,7 @@ private fun ChartCard(
     readout: String?,
     isEmpty: Boolean,
     modifier: Modifier = Modifier,
+    emptyText: String = stringResource(R.string.chart_empty),
     legend: (@Composable () -> Unit)? = null,
     plot: @Composable () -> Unit,
 ) {
@@ -129,7 +130,7 @@ private fun ChartCard(
         }
         if (isEmpty) {
             Text(
-                text = stringResource(R.string.chart_empty),
+                text = emptyText,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp, top = 20.dp, bottom = 20.dp),
@@ -393,19 +394,20 @@ fun ColumnChart(title: String, columns: List<ColumnDatum>, color: Color, modifie
     }
 }
 
-/** A single line over time with a light wash under it, for body weight. */
+/** A single line over time with a light wash under it, for body weight. [emptyText] is shown while there are no points. */
 @Composable
 fun TrendChart(
     title: String,
     points: List<ChartPoint>,
     valueText: (Double) -> String,
     modifier: Modifier = Modifier,
+    emptyText: String = stringResource(R.string.chart_empty),
 ) {
     val colors = LocalOverloadColors.current
     var selected by remember(points) { mutableStateOf<Int?>(null) }
     val readout = selected?.let { points.getOrNull(it) }?.let { "${formatDayShort(it.date)} · ${valueText(it.value)}" }
 
-    ChartCard(title = title, readout = readout, isEmpty = points.isEmpty(), modifier = modifier) {
+    ChartCard(title = title, readout = readout, isEmpty = points.isEmpty(), modifier = modifier, emptyText = emptyText) {
         val ticks = remember(points) {
             val low = points.minOf { it.value }
             val high = points.maxOf { it.value }

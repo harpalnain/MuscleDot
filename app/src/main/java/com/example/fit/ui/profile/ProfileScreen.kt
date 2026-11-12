@@ -172,6 +172,7 @@ fun ProfileContent(state: ProfileUiState, actions: ProfileActions, modifier: Mod
             title = stringResource(R.string.body_weight_chart_title),
             points = state.bodyWeights.map { ChartPoint(it.date, it.weightHg / 10.0) },
             valueText = { formatKg(Math.round(it * 10)) },
+            emptyText = stringResource(R.string.body_weight_chart_empty),
         )
         SectionLabel(stringResource(R.string.backup_section))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

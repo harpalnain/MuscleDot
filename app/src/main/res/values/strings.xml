@@ -54,6 +54,7 @@
     <string name="profile_body_weight_decrease">Decrease body weight</string>
     <string name="profile_body_weight_increase">Increase body weight</string>
     <string name="body_weight_chart_title">Body weight (kg)</string>
+    <string name="body_weight_chart_empty">No body weight entered yet</string>
     <string name="welcome_title">Welcome to Overload</string>
     <string name="welcome_explanation">Tell the app a little about you. Body weight is used for exercises like pull-ups. You can skip this and fill it in later under Profile.</string>
     <string name="welcome_skip">Skip</string>
@@ -190,4 +191,31 @@
     <string name="record_best_session">best session</string>
     <string name="record_most_reps_set">most reps in a set</string>
     <string name="record_most_reps_session">most reps in a session</string>
+    <string name="record_tile_max_weight">Max weight</string>
+    <string name="record_tile_best_set">Best set</string>
+    <string name="record_tile_best_session">Best session</string>
+    <string name="record_tile_most_reps_set">Most reps in a set</string>
+    <string name="record_tile_most_reps_session">Most reps in a session</string>
+    <string name="record_tile_longest">Longest session</string>
+
+    <!-- Exercise page -->
+    <string name="detail_all_routines">All routines</string>
+
+    <!-- Progress -->
+    <string name="progress_exercises">Exercises</string>
+    <string name="progress_routines">Routines</string>
+    <string name="progress_weekly">Weekly</string>
+    <string name="progress_body">Body</string>
+    <string name="progress_empty">No workouts yet. Finish a workout to see your progress here.</string>
+    <string name="progress_choose_routine">Choose routine</string>
+    <string name="progress_last_session">Last session</string>
+    <string name="progress_routine_exercises">Exercises in this routine</string>
+    <string name="progress_this_week">This week so far</string>
+    <string name="progress_best_week">Best week</string>
+    <string name="progress_weekly_load">Total load per week (kg)</string>
+    <string name="progress_weekly_cardio">Cardio per week (minutes)</string>
+    <plurals name="workout_count">
+        <item quantity="one">%1$d workout</item>
+        <item quantity="other">%1$d workouts</item>
+    </plurals>
 </resources>
