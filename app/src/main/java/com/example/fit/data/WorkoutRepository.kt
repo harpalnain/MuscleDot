@@ -14,6 +14,7 @@ import com.example.fit.domain.Workout
 import com.example.fit.domain.WorkoutExercise
 import com.example.fit.domain.WorkoutSet
 import com.example.fit.domain.WorkoutStatus
+import com.example.fit.domain.nextStartingSets
 import com.example.fit.domain.stepped
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -147,6 +148,81 @@ class WorkoutRepository(private val db: AppDatabase, private val startingSets: S
     }
 
     suspend fun deleteWorkout(workoutId: Long) = dao.deleteWorkout(workoutId)
+
+    /**
+     * Saves the workout: carries what was done into its routine (spec 5.7) and marks
+     * it finished. Unticked sets stay in place so the workout can be reopened that day.
+     */
+    suspend fun finish(workoutId: Long) = db.withTransaction { finishInTransaction(workoutId) }
+
+    /** "Continue workout": back to in progress (spec 5.6). */
+    suspend fun reopen(workoutId: Long) = db.withTransaction {
+        val row = dao.findRow(workoutId) ?: return@withTransaction
+        dao.updateWorkout(row.copy(status = WorkoutStatus.IN_PROGRESS))
+    }
+
+    /**
+     * Day close (spec 5.6) for every workout dated before [today]. One still in
+     * progress is saved as [finish] does. Then its unticked sets are deleted,
+     * exercises left without sets are deleted, and a workout left empty is deleted.
+     * Running it again changes nothing.
+     */
+    suspend fun closeDaysBefore(today: LocalDate) = db.withTransaction {
+        for (row in dao.needingCloseBefore(today)) {
+            if (row.status == WorkoutStatus.IN_PROGRESS) finishInTransaction(row.id)
+            dao.deleteUntickedSets(row.id)
+            for (link in dao.exercisesOf(row.id)) {
+                val sets = dao.setsOf(link.id)
+                if (sets.isEmpty()) {
+                    dao.deleteExercise(link.id)
+                } else {
+                    dao.updateSets(sets.mapIndexed { index, set -> set.copy(position = index) })
+                }
+            }
+            val remaining = dao.exercisesOf(row.id)
+            if (remaining.isEmpty()) {
+                dao.deleteWorkout(row.id)
+            } else {
+                dao.updateExercises(remaining.mapIndexed { index, link -> link.copy(position = index) })
+            }
+        }
+    }
+
+    /**
+     * History: finished workouts, ascending by date, holding ticked sets only.
+     * Exercises and workouts without a ticked set are left out.
+     */
+    fun observeSaved(): Flow<List<Workout>> =
+        dao.observeFinished().map { list -> list.mapNotNull { it.toDomain().withTickedSetsOnly() } }.distinctUntilChanged()
+
+    private suspend fun finishInTransaction(workoutId: Long) {
+        val workout = dao.get(workoutId)?.toDomain() ?: return
+        carryIntoRoutine(workout)
+        val row = dao.findRow(workoutId) ?: return
+        dao.updateWorkout(row.copy(status = WorkoutStatus.FINISHED))
+    }
+
+    /**
+     * For each exercise that has a ticked set and is still in the routine, the routine's
+     * starting sets become what [nextStartingSets] says. Never adds or removes an
+     * exercise, and does nothing once the routine is gone.
+     */
+    private suspend fun carryIntoRoutine(workout: Workout) {
+        val routineId = workout.routineId ?: return
+        for (exercise in workout.exercises) {
+            val link = routineDao.findExercise(routineId, exercise.exercise.id) ?: continue
+            val routineSets = routineDao.setsOf(link.id).map { SetValues(it.weightHg, it.reps, it.minutes) }
+            val next = nextStartingSets(routineSets, exercise.sets) ?: continue
+            routineDao.replaceSets(link.id, next)
+        }
+    }
+
+    private fun Workout.withTickedSetsOnly(): Workout? {
+        val ticked = exercises
+            .map { it.copy(sets = it.sets.filter { set -> set.done }) }
+            .filter { it.sets.isNotEmpty() }
+        return if (ticked.isEmpty()) null else copy(exercises = ticked)
+    }
 
     private suspend fun createFromRoutine(date: LocalDate, routineId: Long): Long {
         val routine = requireNotNull(routineDao.getRoutine(routineId)) { "No routine $routineId" }.toDomain()

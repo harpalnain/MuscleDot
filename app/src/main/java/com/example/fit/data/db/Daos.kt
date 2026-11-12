@@ -270,4 +270,36 @@ interface WorkoutDao {
         """,
     )
     suspend fun doneSetCount(workoutId: Long): Int
+
+    @Transaction
+    @Query("SELECT * FROM workout WHERE status = 'FINISHED' ORDER BY date")
+    fun observeFinished(): Flow<List<WorkoutWithExercises>>
+
+    /**
+     * Workouts dated before [date] that the day close still has work to do on: in
+     * progress, holding an unticked set, or left without any exercise.
+     */
+    @Query(
+        """
+        SELECT * FROM workout w
+        WHERE w.date < :date AND (
+            w.status = 'IN_PROGRESS'
+            OR EXISTS (
+                SELECT 1 FROM workout_set s JOIN workout_exercise we ON we.id = s.workoutExerciseId
+                WHERE we.workoutId = w.id AND s.done = 0
+            )
+            OR NOT EXISTS (SELECT 1 FROM workout_exercise we WHERE we.workoutId = w.id)
+        )
+        ORDER BY w.date
+        """,
+    )
+    suspend fun needingCloseBefore(date: LocalDate): List<WorkoutEntity>
+
+    @Query(
+        """
+        DELETE FROM workout_set
+        WHERE done = 0 AND workoutExerciseId IN (SELECT id FROM workout_exercise WHERE workoutId = :workoutId)
+        """,
+    )
+    suspend fun deleteUntickedSets(workoutId: Long)
 }
