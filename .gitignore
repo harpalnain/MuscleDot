@@ -15,3 +15,5 @@
 local.properties
 .kotlin
 .superpowers/
+node_modules/
+tools/exercise-pack/.cache/
