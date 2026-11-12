@@ -303,3 +303,71 @@ interface WorkoutDao {
     )
     suspend fun deleteUntickedSets(workoutId: Long)
 }
+
+/** Whole-database reads and wipes for backup export and import. */
+@Dao
+interface BackupDao {
+    @Query("SELECT * FROM body_weight ORDER BY date")
+    suspend fun bodyWeights(): List<BodyWeightEntity>
+
+    @Query("SELECT * FROM setting ORDER BY `key`")
+    suspend fun settings(): List<SettingEntity>
+
+    @Query(
+        """
+        SELECT * FROM exercise
+        WHERE isCustom = 1
+           OR id IN (SELECT exerciseId FROM routine_exercise)
+           OR id IN (SELECT exerciseId FROM workout_exercise)
+        ORDER BY id
+        """,
+    )
+    suspend fun exercisesToBackUp(): List<ExerciseEntity>
+
+    @Transaction
+    @Query("SELECT * FROM routine ORDER BY position, id")
+    suspend fun routines(): List<RoutineWithExercises>
+
+    @Query("SELECT * FROM schedule_day ORDER BY dayOfWeek")
+    suspend fun schedule(): List<ScheduleDayEntity>
+
+    @Transaction
+    @Query("SELECT * FROM workout ORDER BY date")
+    suspend fun workouts(): List<WorkoutWithExercises>
+
+    @Query("SELECT id FROM exercise")
+    suspend fun exerciseIds(): List<String>
+
+    @Query("DELETE FROM workout")
+    suspend fun deleteWorkouts()
+
+    @Query("DELETE FROM schedule_day")
+    suspend fun deleteSchedule()
+
+    @Query("DELETE FROM routine")
+    suspend fun deleteRoutines()
+
+    @Query("DELETE FROM body_weight")
+    suspend fun deleteBodyWeights()
+
+    @Query("DELETE FROM profile")
+    suspend fun deleteProfile()
+
+    @Query("DELETE FROM setting WHERE `key` != :keep")
+    suspend fun deleteSettingsExcept(keep: String)
+
+    @Query("DELETE FROM exercise WHERE isCustom = 1")
+    suspend fun deleteCustomExercises()
+
+    @Insert
+    suspend fun insertExercises(exercises: List<ExerciseEntity>)
+
+    @Insert
+    suspend fun insertBodyWeights(entries: List<BodyWeightEntity>)
+
+    @Insert
+    suspend fun insertSettings(settings: List<SettingEntity>)
+
+    @Insert
+    suspend fun insertSchedule(days: List<ScheduleDayEntity>)
+}

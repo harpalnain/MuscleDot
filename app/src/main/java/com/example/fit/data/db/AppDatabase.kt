@@ -31,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun profileDao(): ProfileDao
     abstract fun routineDao(): RoutineDao
     abstract fun workoutDao(): WorkoutDao
+    abstract fun backupDao(): BackupDao
 
     companion object {
         const val FILE_NAME = "overload.db"
