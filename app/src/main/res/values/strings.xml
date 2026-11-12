@@ -218,4 +218,18 @@
         <item quantity="one">%1$d workout</item>
         <item quantity="other">%1$d workouts</item>
     </plurals>
+
+    <!-- History -->
+    <string name="history_empty">No workouts yet</string>
+    <string name="history_counts">%1$s · %2$s</string>
+    <plurals name="set_count">
+        <item quantity="one">%1$d set</item>
+        <item quantity="other">%1$d sets</item>
+    </plurals>
+    <plurals name="record_count">
+        <item quantity="one">%1$d record</item>
+        <item quantity="other">%1$d records</item>
+    </plurals>
+    <string name="history_delete_workout">Delete workout</string>
+    <string name="history_delete_question">Delete this workout? This cannot be undone.</string>
 </resources>

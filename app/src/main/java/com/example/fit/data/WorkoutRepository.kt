@@ -14,8 +14,10 @@ import com.example.fit.domain.Workout
 import com.example.fit.domain.WorkoutExercise
 import com.example.fit.domain.WorkoutSet
 import com.example.fit.domain.WorkoutStatus
+import com.example.fit.domain.doneSetCount
 import com.example.fit.domain.nextStartingSets
 import com.example.fit.domain.stepped
+import com.example.fit.domain.tickedOnly
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -71,12 +73,15 @@ class WorkoutRepository(private val db: AppDatabase, private val startingSets: S
             dao.updateSets(listOf(set.copy(weightHg = stepped.weightHg, reps = stepped.reps, minutes = stepped.minutes)))
         }
 
-    /** Adds a set that copies the last one. Cardio keeps its single row. */
+    /**
+     * Adds a set that copies the last one. Cardio keeps its single row. A [done] set is
+     * added to a saved workout, where only ticked sets show, so it copies the last ticked one.
+     */
     suspend fun addSet(workoutId: Long, exerciseId: String, done: Boolean = false) = db.withTransaction {
         val link = dao.findExercise(workoutId, exerciseId) ?: return@withTransaction
         if (exerciseDao.get(exerciseId)?.kind == ExerciseKind.CARDIO) return@withTransaction
         val sets = dao.setsOf(link.id)
-        val last = sets.lastOrNull() ?: return@withTransaction
+        val last = (if (done) sets.lastOrNull { it.done } else null) ?: sets.lastOrNull() ?: return@withTransaction
         dao.insertSets(listOf(last.copy(id = 0, position = sets.size, done = done)))
     }
 
@@ -92,6 +97,18 @@ class WorkoutRepository(private val db: AppDatabase, private val startingSets: S
         } else {
             dao.updateSets(remaining.mapIndexed { index, set -> set.copy(position = index) })
         }
+    }
+
+    /**
+     * Removes a set from a saved workout. A workout left without any ticked set has nothing
+     * to show in history, so it is deleted with it: the result says whether that happened.
+     */
+    suspend fun removeSavedSet(workoutId: Long, exerciseId: String, position: Int): Boolean = db.withTransaction {
+        removeSet(workoutId, exerciseId, position)
+        val left = dao.get(workoutId)?.toDomain() ?: return@withTransaction false
+        if (left.doneSetCount() > 0) return@withTransaction false
+        dao.deleteWorkout(workoutId)
+        true
     }
 
     /**
@@ -193,7 +210,9 @@ class WorkoutRepository(private val db: AppDatabase, private val startingSets: S
      * Exercises and workouts without a ticked set are left out.
      */
     fun observeSaved(): Flow<List<Workout>> =
-        dao.observeFinished().map { list -> list.mapNotNull { it.toDomain().withTickedSetsOnly() } }.distinctUntilChanged()
+        dao.observeFinished()
+            .map { list -> list.map { it.toDomain().tickedOnly() }.filter { it.exercises.isNotEmpty() } }
+            .distinctUntilChanged()
 
     private suspend fun finishInTransaction(workoutId: Long) {
         val workout = dao.get(workoutId)?.toDomain() ?: return
@@ -215,13 +234,6 @@ class WorkoutRepository(private val db: AppDatabase, private val startingSets: S
             val next = nextStartingSets(routineSets, exercise.sets) ?: continue
             routineDao.replaceSets(link.id, next)
         }
-    }
-
-    private fun Workout.withTickedSetsOnly(): Workout? {
-        val ticked = exercises
-            .map { it.copy(sets = it.sets.filter { set -> set.done }) }
-            .filter { it.sets.isNotEmpty() }
-        return if (ticked.isEmpty()) null else copy(exercises = ticked)
     }
 
     private suspend fun createFromRoutine(date: LocalDate, routineId: Long): Long {

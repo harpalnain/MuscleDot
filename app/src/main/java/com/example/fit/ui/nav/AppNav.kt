@@ -40,6 +40,8 @@ import com.example.fit.R
 import com.example.fit.ui.appContainer
 import com.example.fit.ui.components.LocalFlipFrame
 import com.example.fit.ui.exercise.ExerciseDetailScreen
+import com.example.fit.ui.history.HistoryScreen
+import com.example.fit.ui.history.WorkoutDetailScreen
 import com.example.fit.ui.picker.ExercisePickerScreen
 import com.example.fit.ui.profile.ProfileScreen
 import com.example.fit.ui.profile.WelcomeScreen
@@ -117,7 +119,9 @@ fun AppNav() {
                 composable<ProgressRoute> {
                     ProgressScreen(onShowExercise = { navController.navigate(ExerciseDetailRoute(it)) })
                 }
-                composable<HistoryRoute> { Placeholder("screen-history") }
+                composable<HistoryRoute> {
+                    HistoryScreen(onOpen = { navController.navigate(WorkoutDetailRoute(it)) })
+                }
                 composable<ProfileRoute> { ProfileScreen() }
                 composable<RoutineEditorRoute> { entry ->
                     val route = entry.toRoute<RoutineEditorRoute>()
@@ -148,7 +152,12 @@ fun AppNav() {
                         onBack = { navController.popBackStack() },
                     )
                 }
-                composable<WorkoutDetailRoute> { Placeholder("screen-workout-detail") }
+                composable<WorkoutDetailRoute> { entry ->
+                    WorkoutDetailScreen(
+                        workoutId = entry.toRoute<WorkoutDetailRoute>().workoutId,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
             }
         }
     }
@@ -194,10 +203,4 @@ private fun TabBar(navController: NavHostController) {
             )
         }
     }
-}
-
-/** Stands in for a screen that a later change adds; the tag stays on the real screen's root. */
-@Composable
-private fun Placeholder(tag: String) {
-    Box(Modifier.fillMaxSize().testTag(tag))
 }

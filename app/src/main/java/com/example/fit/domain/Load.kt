@@ -33,3 +33,7 @@ fun Workout.loadHg(): Long = exercises.sumOf { it.loadHg(bodyWeightHg) }
 fun Workout.cardioMinutes(): Int = exercises.sumOf { it.totalMinutes() }
 
 fun Workout.doneSetCount(): Int = exercises.sumOf { it.doneSets().size }
+
+/** The same workout holding ticked sets only; exercises left without sets are dropped. */
+fun Workout.tickedOnly(): Workout =
+    copy(exercises = exercises.map { it.copy(sets = it.doneSets()) }.filter { it.sets.isNotEmpty() })

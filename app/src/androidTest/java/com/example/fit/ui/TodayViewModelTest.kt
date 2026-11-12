@@ -81,7 +81,9 @@ class TodayViewModelTest {
     fun tickingTheLastSetOpensTheNextExercise(): Unit = runBlocking {
         assertEquals("bench-press", active().openExerciseId)
         for (i in 0..2) vm.toggleDone("bench-press", i)
-        assertEquals("pull-up", active { it.tickedCount == 3 }.openExerciseId)
+        // The tick and the move to the next exercise are two updates; wait for the second.
+        // This times out if the next exercise never opens.
+        active { it.tickedCount == 3 && it.openExerciseId == "pull-up" }
     }
 
     @Test

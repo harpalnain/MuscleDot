@@ -2,6 +2,7 @@ package com.example.fit.domain
 
 import java.time.LocalDate
 import java.time.Period
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -9,6 +10,8 @@ import java.util.Locale
 private val LOCALE = Locale.US
 private val DAY_LONG = DateTimeFormatter.ofPattern("EEEE, d MMMM", LOCALE)
 private val DAY_SHORT = DateTimeFormatter.ofPattern("d MMM", LOCALE)
+private val MONTH = DateTimeFormatter.ofPattern("MMMM yyyy", LOCALE)
+private val WEEKDAY_SHORT = DateTimeFormatter.ofPattern("EEE", LOCALE)
 private val BODY_WEIGHT_TEXT = Regex("""\d{1,3}(\.\d)?""")
 /** Body weight is accepted from 20.0 to 400.0 kg. */
 const val MIN_BODY_WEIGHT_HG = 200
@@ -57,6 +60,12 @@ fun formatDayLong(date: LocalDate): String = DAY_LONG.format(date)
 
 /** "5 Nov" */
 fun formatDayShort(date: LocalDate): String = DAY_SHORT.format(date)
+
+/** "November 2026" */
+fun formatMonth(month: YearMonth): String = MONTH.format(month)
+
+/** "Wed" */
+fun formatWeekdayShort(date: LocalDate): String = WEEKDAY_SHORT.format(date)
 
 /**
  * One line describing an exercise's sets, from its first set: "3 sets · 40 kg × 10".

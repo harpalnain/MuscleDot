@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -147,5 +148,30 @@ class WorkoutSavingTest {
         val other = routines.createRoutine("Full Body")
         routines.addExercise(other, "bench-press")
         assertEquals(listOf(SetValues(205, 10), SetValues(200, 10)), routines.getRoutine(other)!!.exercises[0].sets)
+    }
+
+    @Test
+    fun addSetToASavedWorkout_copiesTheLastTickedSet_andLeavesTheRoutineAlone() = runTest {
+        val id = trainMonday()
+        workouts.finish(id)
+        val routineBefore = routineBench()
+        // stored for bench: 20.5 × 10 ticked, 20 × 10 ticked, 20 × 9 not ticked
+        workouts.adjustSet(id, "bench-press", 1, SetField.REPS, +2)
+        workouts.addSet(id, "bench-press", done = true)
+        val saved = workouts.observeSaved().first().single().exercises[0].sets
+        assertEquals(listOf(SetValues(205, 10), SetValues(200, 12), SetValues(200, 12)), saved.map { it.values })
+        assertEquals(routineBefore, routineBench())
+    }
+
+    @Test
+    fun removeSavedSet_deletesTheWorkoutOnceNothingTickedIsLeft() = runTest {
+        val id = trainMonday()
+        workouts.finish(id)
+        assertFalse(workouts.removeSavedSet(id, "bench-press", 0))
+        assertEquals(listOf(SetValues(200, 10)), workouts.observeSaved().first().single().exercises[0].sets.map { it.values })
+        // the ticked set that is left now sits at position 0; an unticked set is still stored behind it
+        assertTrue(workouts.removeSavedSet(id, "bench-press", 0))
+        assertNull(workouts.observeWorkout(id).first())
+        assertTrue(workouts.observeSaved().first().isEmpty())
     }
 }
