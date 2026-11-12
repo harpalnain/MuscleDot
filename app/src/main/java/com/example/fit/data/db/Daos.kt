@@ -192,3 +192,82 @@ interface RoutineDao {
     )
     suspend fun latestFinishedSets(exerciseId: String): List<WorkoutSetEntity>
 }
+
+/** One exercise of a workout with its exercise row and its sets. Lists are not ordered. */
+data class WorkoutExerciseWithSets(
+    @Embedded val link: WorkoutExerciseEntity,
+    @Relation(parentColumn = "exerciseId", entityColumn = "id") val exercise: ExerciseEntity,
+    @Relation(parentColumn = "id", entityColumn = "workoutExerciseId") val sets: List<WorkoutSetEntity>,
+)
+
+data class WorkoutWithExercises(
+    @Embedded val workout: WorkoutEntity,
+    @Relation(entity = WorkoutExerciseEntity::class, parentColumn = "id", entityColumn = "workoutId")
+    val exercises: List<WorkoutExerciseWithSets>,
+)
+
+@Dao
+interface WorkoutDao {
+    @Transaction
+    @Query("SELECT * FROM workout WHERE date = :date")
+    fun observeOn(date: LocalDate): Flow<WorkoutWithExercises?>
+
+    @Transaction
+    @Query("SELECT * FROM workout WHERE id = :id")
+    fun observe(id: Long): Flow<WorkoutWithExercises?>
+
+    @Transaction
+    @Query("SELECT * FROM workout WHERE id = :id")
+    suspend fun get(id: Long): WorkoutWithExercises?
+
+    @Query("SELECT * FROM workout WHERE date = :date")
+    suspend fun findOn(date: LocalDate): WorkoutEntity?
+
+    @Query("SELECT * FROM workout WHERE id = :id")
+    suspend fun findRow(id: Long): WorkoutEntity?
+
+    @Insert
+    suspend fun insertWorkout(workout: WorkoutEntity): Long
+
+    @Update
+    suspend fun updateWorkout(workout: WorkoutEntity)
+
+    @Query("DELETE FROM workout WHERE id = :id")
+    suspend fun deleteWorkout(id: Long)
+
+    @Query("SELECT * FROM workout_exercise WHERE workoutId = :workoutId ORDER BY position, id")
+    suspend fun exercisesOf(workoutId: Long): List<WorkoutExerciseEntity>
+
+    @Query("SELECT * FROM workout_exercise WHERE workoutId = :workoutId AND exerciseId = :exerciseId")
+    suspend fun findExercise(workoutId: Long, exerciseId: String): WorkoutExerciseEntity?
+
+    @Insert
+    suspend fun insertExercise(link: WorkoutExerciseEntity): Long
+
+    @Update
+    suspend fun updateExercises(links: List<WorkoutExerciseEntity>)
+
+    @Query("DELETE FROM workout_exercise WHERE id = :id")
+    suspend fun deleteExercise(id: Long)
+
+    @Query("SELECT * FROM workout_set WHERE workoutExerciseId = :workoutExerciseId ORDER BY position, id")
+    suspend fun setsOf(workoutExerciseId: Long): List<WorkoutSetEntity>
+
+    @Insert
+    suspend fun insertSets(sets: List<WorkoutSetEntity>)
+
+    @Update
+    suspend fun updateSets(sets: List<WorkoutSetEntity>)
+
+    @Query("DELETE FROM workout_set WHERE id = :id")
+    suspend fun deleteSet(id: Long)
+
+    @Query(
+        """
+        SELECT COUNT(*) FROM workout_set s
+        JOIN workout_exercise we ON we.id = s.workoutExerciseId
+        WHERE we.workoutId = :workoutId AND s.done = 1
+        """,
+    )
+    suspend fun doneSetCount(workoutId: Long): Int
+}
