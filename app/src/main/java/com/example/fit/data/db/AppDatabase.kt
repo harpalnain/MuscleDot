@@ -29,6 +29,7 @@ import java.time.LocalDate
 abstract class AppDatabase : RoomDatabase() {
     abstract fun exerciseDao(): ExerciseDao
     abstract fun profileDao(): ProfileDao
+    abstract fun routineDao(): RoutineDao
 
     companion object {
         const val FILE_NAME = "overload.db"
