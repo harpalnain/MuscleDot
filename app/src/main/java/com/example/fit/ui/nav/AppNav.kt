@@ -44,6 +44,7 @@ import com.example.fit.ui.profile.ProfileScreen
 import com.example.fit.ui.profile.WelcomeScreen
 import com.example.fit.ui.routines.RoutineEditorScreen
 import com.example.fit.ui.routines.RoutinesScreen
+import com.example.fit.ui.today.TodayScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.reflect.KClass
@@ -98,7 +99,16 @@ fun AppNav() {
                         onFinished = { navController.navigate(TodayRoute) { popUpTo<WelcomeRoute> { inclusive = true } } },
                     )
                 }
-                composable<TodayRoute> { Placeholder("screen-today") }
+                composable<TodayRoute> { entry ->
+                    val picked by entry.savedStateHandle.getStateFlow<String?>(PICKED_EXERCISE_KEY, null)
+                        .collectAsStateWithLifecycle()
+                    TodayScreen(
+                        pickedExerciseId = picked,
+                        onPickedHandled = { entry.savedStateHandle[PICKED_EXERCISE_KEY] = null },
+                        onPickExercise = { workoutId -> navController.navigate(ExercisePickerRoute(workoutId = workoutId)) },
+                        onShowExercise = { navController.navigate(ExerciseDetailRoute(it)) },
+                    )
+                }
                 composable<RoutinesRoute> {
                     RoutinesScreen(onEdit = { navController.navigate(RoutineEditorRoute(it)) })
                 }

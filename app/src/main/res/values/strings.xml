@@ -144,4 +144,50 @@
     <string name="kind_explain_body_weight">For pull-ups, dips and push-ups: load is your body weight plus any extra weight, × reps.</string>
     <string name="kind_explain_reps_only">Only reps are counted. It adds nothing to load.</string>
     <string name="kind_explain_cardio">Tracked in minutes. It adds nothing to load.</string>
+
+    <!-- Today -->
+    <string name="today_change_routine">Change routine</string>
+    <string name="today_week">This week: %1$d of %2$d done</string>
+    <string name="today_week_no_plan">This week: %1$d done</string>
+    <string name="today_sets_done">%1$d of %2$d sets</string>
+    <string name="today_best">Best %1$s</string>
+    <string name="today_load">Load %1$s</string>
+    <string name="amount_reps">%1$d reps</string>
+    <string name="amount_minutes">%1$d min</string>
+    <string name="today_remove_last_set">Remove last set</string>
+    <string name="today_swap_exercise">Swap exercise</string>
+    <string name="today_remove_exercise">Remove exercise</string>
+    <string name="today_total_load">Total load today</string>
+    <string name="today_total_with_cardio">%1$s · %2$d min cardio</string>
+    <string name="today_finish">Finish workout</string>
+    <plurals name="today_finish_warning">
+        <item quantity="one">%1$d set is not ticked and will not be saved. Finish anyway?</item>
+        <item quantity="other">%1$d sets are not ticked and will not be saved. Finish anyway?</item>
+    </plurals>
+    <string name="today_finish_confirm">Finish</string>
+    <string name="today_go_back">Go back</string>
+    <string name="today_scope_question">Change only today\'s workout, or the routine as well?</string>
+    <string name="today_scope_today">Only today</string>
+    <string name="today_scope_routine">Also update the routine</string>
+    <string name="today_rest_explanation">Nothing is planned for today. You can still train: pick any routine.</string>
+    <string name="today_start_routine">Start a routine</string>
+    <string name="today_choose_routine">Routine for today</string>
+    <string name="today_no_routines">You have no routines yet. Create one in the Routines tab.</string>
+    <string name="today_finished">Workout finished</string>
+    <string name="today_finished_explanation">It is saved in your history. Tapped Finish too early? You can carry on until the day ends.</string>
+    <string name="today_summary_load">Total load</string>
+    <string name="today_summary_sets">Sets done</string>
+    <string name="today_summary_cardio">Cardio</string>
+    <string name="today_continue">Continue workout</string>
+    <string name="today_body_weight_title">Your body weight</string>
+    <string name="today_body_weight_explanation">This exercise lifts your body, so its load is your body weight plus any extra weight. Enter your body weight once; you can change it under Profile.</string>
+    <string name="today_body_weight_confirm">Save and tick</string>
+
+    <!-- Personal records -->
+    <string name="record_line">New record: %1$s, %2$s</string>
+    <string name="record_max_weight">max weight</string>
+    <string name="record_best_set">best set</string>
+    <string name="record_best_session">best session</string>
+    <string name="record_most_reps_set">most reps in a set</string>
+    <string name="record_most_reps_session">most reps in a session</string>
 </resources>
