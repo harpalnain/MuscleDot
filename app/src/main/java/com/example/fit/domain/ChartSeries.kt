@@ -89,13 +89,14 @@ private const val TOLERANCE = 1e-9
 /**
  * Axis ticks covering [min]..[max] at a round step. The step is the smallest of
  * 1, 2, 2.5, 5, 10 times a power of ten that is at least half the range, which
- * gives three or four ticks. A single value is first widened by 1 on each side.
+ * gives three or four ticks. A single value is first widened by 1 on each side,
+ * but never below zero: loads, reps and minutes have no negative part.
  */
 fun niceTicks(min: Double, max: Double): List<Double> {
     var low = min
     var high = max
     if (high <= low) {
-        low -= 1
+        low = if (low >= 0) maxOf(0.0, low - 1) else low - 1
         high += 1
     }
     val rough = (high - low) / 2

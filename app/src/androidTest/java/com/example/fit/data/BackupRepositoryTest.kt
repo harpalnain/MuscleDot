@@ -1,6 +1,7 @@
 package com.example.fit.data
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.fit.data.backup.BackupCodec
 import com.example.fit.data.backup.BackupException
 import com.example.fit.data.backup.BackupRepository
 import com.example.fit.data.db.AppDatabase
@@ -123,6 +124,27 @@ class BackupRepositoryTest {
             good.replaceFirst("overload-backup", "x"),
         )
         for (bad in badFiles) {
+            assertThrows(BackupException::class.java) { runBlocking { BackupRepository(source).import(bad) } }
+            assertEquals(before, snapshot(source))
+        }
+    }
+
+    @Test
+    fun import_thatFailsHalfWay_keepsEverything() = runTest {
+        val good = BackupRepository(source).export(now)
+        val before = snapshot(source)
+        val brokenInside = listOf(
+            // a routine and workouts of an exercise that neither the file nor the app has
+            good.replace("\"exerciseId\":\"bench-press\"", "\"exerciseId\":\"no-such-exercise\""),
+            // two workouts on the same day
+            good.replace("\"date\":\"2026-11-10\"", "\"date\":\"2026-11-09\""),
+            // a workout date that is not a date
+            good.replace("\"date\":\"2026-11-10\"", "\"date\":\"2026-13-40\""),
+        )
+        for (bad in brokenInside) {
+            assertTrue(bad != good)
+            // Well-formed backup files: each is only found out after the old data has been deleted.
+            BackupCodec.decode(bad)
             assertThrows(BackupException::class.java) { runBlocking { BackupRepository(source).import(bad) } }
             assertEquals(before, snapshot(source))
         }

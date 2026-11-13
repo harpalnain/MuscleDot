@@ -109,4 +109,11 @@ class ChartSeriesTest {
         assertEquals(listOf(600.0, 800.0, 1000.0, 1200.0), niceTicks(720.0, 1010.0))
         assertEquals(listOf(499.0, 500.0, 501.0), niceTicks(500.0, 500.0))
     }
+
+    @Test
+    fun axisTicksOfASingleValueNeverGoBelowZero() {
+        // A load, reps or minutes axis has no negative part, even when every session is 0.
+        assertEquals(listOf(0.0, 0.5, 1.0), niceTicks(0.0, 0.0))
+        assertEquals(listOf(0.0, 1.0, 2.0), niceTicks(0.5, 0.5))
+    }
 }

@@ -41,6 +41,16 @@ fun formatAxis(value: Double): String {
 }
 
 /**
+ * The labels of one axis. From 10,000 up a label is compact ("20K", "17.2K"), but only
+ * while every tick is a whole hundred: ticks closer together would round to the same
+ * compact label, so such an axis is written in full ("15,000", "15,025", "15,050").
+ */
+fun formatAxisLabels(ticks: List<Double>): List<String> {
+    val round = ticks.all { Math.round(it * 10) % 1000 == 0L }
+    return ticks.map { if (round) formatAxis(it) else formatNumber(it) }
+}
+
+/**
  * Body weight typed by the user, as hectograms: "72.3" gives 723. Null unless it
  * is a number from 20.0 to 400.0 kg with at most one decimal.
  */

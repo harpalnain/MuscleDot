@@ -25,6 +25,17 @@ class FormatTest {
     }
 
     @Test
+    fun axisLabelsOfOneAxisNeverRepeat() {
+        // Round ticks keep the short form from 10,000 up.
+        assertEquals(listOf("0", "5,000", "10K"), formatAxisLabels(listOf(0.0, 5000.0, 10000.0)))
+        assertEquals(listOf("10K", "10.1K", "10.2K"), formatAxisLabels(listOf(10000.0, 10100.0, 10200.0)))
+        // Ticks closer than 100 apart would all round to the same short label, so they are written in full.
+        assertEquals(listOf("15,000", "15,025", "15,050"), formatAxisLabels(listOf(15000.0, 15025.0, 15050.0)))
+        assertEquals(listOf("600", "800", "1,000"), formatAxisLabels(listOf(600.0, 800.0, 1000.0)))
+        assertEquals(emptyList<String>(), formatAxisLabels(emptyList()))
+    }
+
+    @Test
     fun bodyWeightParsing() {
         assertEquals(723, parseKgToHg("72.3"))
         assertEquals(720, parseKgToHg("72"))

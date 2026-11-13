@@ -67,6 +67,8 @@
     <string name="backup_replace_question">Replace everything in the app with this backup? This cannot be undone.</string>
     <string name="backup_replace">Replace</string>
     <string name="backup_saved">Backup saved</string>
+    <string name="backup_save_failed">The backup could not be saved. Try again, or pick another place.</string>
+    <string name="backup_read_failed">That file could not be read</string>
     <string name="backup_restored">Backup restored</string>
     <string name="backup_not_a_backup">That file is not an Overload backup</string>
     <string name="backup_newer_version">That backup was made by a newer version of the app</string>

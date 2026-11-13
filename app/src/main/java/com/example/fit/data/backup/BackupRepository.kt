@@ -15,6 +15,8 @@ import com.example.fit.data.db.WorkoutEntity
 import com.example.fit.data.db.WorkoutExerciseEntity
 import com.example.fit.data.db.WorkoutSetEntity
 import com.example.fit.domain.Profile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -82,14 +84,13 @@ class BackupRepository(private val db: AppDatabase) {
      * everything as it was. Throws [BackupException].
      */
     suspend fun import(text: String) {
-        val file = BackupCodec.decode(text)
+        // A large file takes a moment to parse: not on the thread that draws the screen.
+        val file = withContext(Dispatchers.Default) { BackupCodec.decode(text) }
         try {
             db.withTransaction { replaceAll(file) }
-        } catch (e: BackupException) {
-            throw e
         } catch (e: Exception) {
             // A bad date or a reference to something the file does not contain.
-            throw BackupException(BackupException.Reason.NOT_A_BACKUP)
+            throw importFailure(e)
         }
     }
 

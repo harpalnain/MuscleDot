@@ -61,6 +61,7 @@ import com.example.fit.domain.MIN_AVERAGE_N
 import com.example.fit.domain.Measure
 import com.example.fit.domain.SessionSeries
 import com.example.fit.domain.formatAxis
+import com.example.fit.domain.formatAxisLabels
 import com.example.fit.domain.formatDayShort
 import com.example.fit.domain.formatNumber
 import com.example.fit.domain.niceTicks
@@ -168,13 +169,14 @@ private fun PlotArea(
         fontWeight = FontWeight.SemiBold,
     )
     val scale = remember(ticks) { PlotScale(ticks) }
+    val tickLabels = remember(ticks) { formatAxisLabels(ticks) }
 
     Row(Modifier.fillMaxWidth().height(height)) {
         Canvas(Modifier.width(GutterWidth).fillMaxHeight()) {
             val top = TopPadding.toPx()
             val bottom = size.height - AxisBand.toPx()
-            for (tick in ticks) {
-                val text = measurer.measure(formatAxis(tick), labelStyle)
+            ticks.forEachIndexed { index, tick ->
+                val text = measurer.measure(tickLabels[index], labelStyle)
                 drawText(
                     textLayoutResult = text,
                     topLeft = Offset(size.width - text.size.width - 6.dp.toPx(), scale.y(tick, top, bottom) - text.size.height / 2f),

@@ -59,8 +59,39 @@ fun repeatIntervalMs(heldMs: Long): Long? = when {
 }
 
 /**
- * A − or + button. A press steps once at once; holding it keeps stepping on the
- * schedule of [repeatIntervalMs] until it is released.
+ * What one press of a − or + button does, from finger down to its end.
+ *
+ * A tap steps once, when the finger lifts. A hold steps once it has lasted
+ * [FIRST_REPEAT_MS] and then keeps stepping on the schedule of [repeatIntervalMs].
+ * A press that is taken away before that (a scroll started under the finger, the
+ * button was disabled or left the screen) steps nothing, so starting to scroll on a
+ * button never changes a number.
+ */
+class StepPress(private val onStep: () -> Unit) {
+    private var held = false
+
+    /** Runs while the finger stays down. Cancel it when the press ends, however it ends. */
+    suspend fun hold() {
+        delay(FIRST_REPEAT_MS)
+        held = true
+        var heldMs = FIRST_REPEAT_MS
+        while (true) {
+            onStep()
+            val wait = repeatIntervalMs(heldMs) ?: break
+            delay(wait)
+            heldMs += wait
+        }
+    }
+
+    /** The finger lifted. A press that never became a hold was a tap, and steps once. */
+    fun lift() {
+        if (!held) onStep()
+    }
+}
+
+/**
+ * A − or + button. A tap steps once; holding it steps repeatedly, slowly and then
+ * fast, until it is released. See [StepPress].
  */
 @Composable
 fun StepButton(
@@ -98,22 +129,20 @@ fun StepButton(
                 if (!enabled) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown()
-                    val press = PressInteraction.Press(down.position)
-                    interactions.tryEmit(press)
-                    currentOnStep()
-                    val repeating = scope.launch {
-                        var held = FIRST_REPEAT_MS
-                        delay(FIRST_REPEAT_MS)
-                        while (true) {
-                            currentOnStep()
-                            val wait = repeatIntervalMs(held) ?: break
-                            delay(wait)
-                            held += wait
-                        }
+                    val pressed = PressInteraction.Press(down.position)
+                    interactions.tryEmit(pressed)
+                    val press = StepPress { currentOnStep() }
+                    val holding = scope.launch { press.hold() }
+                    var lifted = false
+                    try {
+                        lifted = waitForUpOrCancellation() != null
+                    } finally {
+                        // Reached however the press ends, also when this gesture is cut short
+                        // because the button was disabled while held: the repeats must stop.
+                        holding.cancel()
+                        if (lifted) press.lift()
+                        interactions.tryEmit(if (lifted) PressInteraction.Release(pressed) else PressInteraction.Cancel(pressed))
                     }
-                    val up = waitForUpOrCancellation()
-                    repeating.cancel()
-                    interactions.tryEmit(if (up != null) PressInteraction.Release(press) else PressInteraction.Cancel(press))
                 }
             },
     ) {

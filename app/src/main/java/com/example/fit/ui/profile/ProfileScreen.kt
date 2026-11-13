@@ -1,7 +1,5 @@
 package com.example.fit.ui.profile
 
-import android.content.Context
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -34,10 +32,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fit.R
 import com.example.fit.data.backup.backupFileName
+import com.example.fit.data.backup.readTextCapped
+import com.example.fit.data.backup.writeTextTo
 import com.example.fit.domain.ChartPoint
 import com.example.fit.domain.formatKg
 import com.example.fit.domain.parseKgToHg
@@ -61,8 +61,8 @@ import com.example.fit.ui.components.StepButton
 import com.example.fit.ui.components.TrendChart
 import com.example.fit.ui.overloadViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -75,39 +75,44 @@ private val INCHES = 0..11
 private const val BACKUP_MIME = "application/json"
 
 /** A backup is small text. Anything bigger than this is some other file, and is not read into memory. */
-private const val MAX_BACKUP_BYTES = 50L * 1024 * 1024
+private const val MAX_BACKUP_BYTES = 50 * 1024 * 1024
 
 @Composable
 fun ProfileScreen() {
     val viewModel = overloadViewModel { ProfileViewModel(it.profile, it.backup, it.today, it.clock) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val importWaiting by viewModel.importWaiting.collectAsStateWithLifecycle()
+    // The app's own resolver, not the screen's: a save keeps going when the screen is left.
+    val resolver = LocalContext.current.applicationContext.contentResolver
     val snackbar = remember { SnackbarHostState() }
-    var pendingImport by remember { mutableStateOf<String?>(null) }
 
     val messages = mapOf(
         BackupMessage.SAVED to stringResource(R.string.backup_saved),
+        BackupMessage.SAVE_FAILED to stringResource(R.string.backup_save_failed),
+        BackupMessage.READ_FAILED to stringResource(R.string.backup_read_failed),
         BackupMessage.RESTORED to stringResource(R.string.backup_restored),
         BackupMessage.NOT_A_BACKUP to stringResource(R.string.backup_not_a_backup),
         BackupMessage.NEWER_VERSION to stringResource(R.string.backup_newer_version),
     )
 
+    LaunchedEffect(viewModel) {
+        viewModel.backupMessages.collect { snackbar.showSnackbar(messages.getValue(it)) }
+    }
+
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(BACKUP_MIME)) { uri ->
         if (uri != null) {
-            scope.launch {
-                val text = viewModel.exportText()
-                withContext(Dispatchers.IO) { context.writeText(uri, text) }
-                snackbar.showSnackbar(messages.getValue(BackupMessage.SAVED))
+            viewModel.exportBackup { text ->
+                withContext(Dispatchers.IO) { writeTextTo({ resolver.openOutputStream(uri, "wt") }, text) }
             }
         }
     }
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
-            scope.launch {
-                val text = withContext(Dispatchers.IO) { context.readText(uri) }
-                // A file that cannot be read as text is certainly not a backup; let the import say so.
-                pendingImport = text.orEmpty()
+            viewModel.readImport {
+                withContext(Dispatchers.IO) {
+                    val input = resolver.openInputStream(uri) ?: throw IOException("The file could not be opened")
+                    input.use { readTextCapped(it, MAX_BACKUP_BYTES) }
+                }
             }
         }
     }
@@ -129,31 +134,17 @@ fun ProfileScreen() {
         SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter))
     }
 
-    pendingImport?.let { text ->
+    if (importWaiting) {
         AlertDialog(
-            onDismissRequest = { pendingImport = null },
+            onDismissRequest = viewModel::cancelImport,
             text = { Text(stringResource(R.string.backup_replace_question)) },
             confirmButton = {
-                TextButton(onClick = {
-                    pendingImport = null
-                    scope.launch { snackbar.showSnackbar(messages.getValue(viewModel.importText(text))) }
-                }) { Text(stringResource(R.string.backup_replace)) }
+                TextButton(onClick = viewModel::confirmImport) { Text(stringResource(R.string.backup_replace)) }
             },
-            dismissButton = { TextButton(onClick = { pendingImport = null }) { Text(stringResource(R.string.cancel)) } },
+            dismissButton = { TextButton(onClick = viewModel::cancelImport) { Text(stringResource(R.string.cancel)) } },
         )
     }
 }
-
-private fun Context.writeText(uri: Uri, text: String) {
-    contentResolver.openOutputStream(uri, "wt")?.use { it.write(text.toByteArray()) }
-}
-
-private fun Context.readText(uri: Uri): String? = runCatching {
-    contentResolver.openInputStream(uri)?.use { input ->
-        val bytes = input.readNBytes((MAX_BACKUP_BYTES + 1).toInt())
-        if (bytes.size > MAX_BACKUP_BYTES) null else String(bytes)
-    }
-}.getOrNull()
 
 @Composable
 fun ProfileContent(state: ProfileUiState, actions: ProfileActions, modifier: Modifier = Modifier) {

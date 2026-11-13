@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -91,6 +92,16 @@ fun AppNav() {
     }
 
     val navController = rememberNavController()
+
+    /**
+     * Runs [action] only while [entry] is still the screen in front. A second tap that
+     * lands while that screen is leaving, or after it has already opened another one,
+     * then does nothing: it can neither go back twice (which from Today would leave an
+     * empty app) nor open the same page twice.
+     */
+    fun fromFront(entry: NavBackStackEntry, action: NavHostController.() -> Unit) {
+        if (navController.currentBackStackEntry?.id == entry.id) navController.action()
+    }
     CompositionLocalProvider(LocalFlipFrame provides flipFrame()) {
         Scaffold(bottomBar = { TabBar(navController) }) { padding ->
             NavHost(
@@ -98,9 +109,11 @@ fun AppNav() {
                 startDestination = if (showWelcome) WelcomeRoute else TodayRoute,
                 modifier = Modifier.padding(padding),
             ) {
-                composable<WelcomeRoute> {
+                composable<WelcomeRoute> { entry ->
                     WelcomeScreen(
-                        onFinished = { navController.navigate(TodayRoute) { popUpTo<WelcomeRoute> { inclusive = true } } },
+                        onFinished = {
+                            fromFront(entry) { navigate(TodayRoute) { popUpTo<WelcomeRoute> { inclusive = true } } }
+                        },
                     )
                 }
                 composable<TodayRoute> { entry ->
@@ -109,18 +122,20 @@ fun AppNav() {
                     TodayScreen(
                         pickedExerciseId = picked,
                         onPickedHandled = { entry.savedStateHandle[PICKED_EXERCISE_KEY] = null },
-                        onPickExercise = { workoutId -> navController.navigate(ExercisePickerRoute(workoutId = workoutId)) },
-                        onShowExercise = { navController.navigate(ExerciseDetailRoute(it)) },
+                        onPickExercise = { workoutId ->
+                            fromFront(entry) { navigate(ExercisePickerRoute(workoutId = workoutId)) }
+                        },
+                        onShowExercise = { id -> fromFront(entry) { navigate(ExerciseDetailRoute(id)) } },
                     )
                 }
-                composable<RoutinesRoute> {
-                    RoutinesScreen(onEdit = { navController.navigate(RoutineEditorRoute(it)) })
+                composable<RoutinesRoute> { entry ->
+                    RoutinesScreen(onEdit = { id -> fromFront(entry) { navigate(RoutineEditorRoute(id)) } })
                 }
-                composable<ProgressRoute> {
-                    ProgressScreen(onShowExercise = { navController.navigate(ExerciseDetailRoute(it)) })
+                composable<ProgressRoute> { entry ->
+                    ProgressScreen(onShowExercise = { id -> fromFront(entry) { navigate(ExerciseDetailRoute(id)) } })
                 }
-                composable<HistoryRoute> {
-                    HistoryScreen(onOpen = { navController.navigate(WorkoutDetailRoute(it)) })
+                composable<HistoryRoute> { entry ->
+                    HistoryScreen(onOpen = { id -> fromFront(entry) { navigate(WorkoutDetailRoute(id)) } })
                 }
                 composable<ProfileRoute> { ProfileScreen() }
                 composable<RoutineEditorRoute> { entry ->
@@ -131,31 +146,35 @@ fun AppNav() {
                         routineId = route.routineId,
                         pickedExerciseId = picked,
                         onPickedHandled = { entry.savedStateHandle[PICKED_EXERCISE_KEY] = null },
-                        onPickExercise = { navController.navigate(ExercisePickerRoute(routineId = route.routineId)) },
-                        onDone = { navController.popBackStack() },
+                        onPickExercise = {
+                            fromFront(entry) { navigate(ExercisePickerRoute(routineId = route.routineId)) }
+                        },
+                        onDone = { fromFront(entry) { popBackStack() } },
                     )
                 }
                 composable<ExercisePickerRoute> { entry ->
                     ExercisePickerScreen(
                         route = entry.toRoute(),
                         onPicked = { exerciseId ->
-                            // Hand the choice to the screen that asked for it.
-                            navController.previousBackStackEntry?.savedStateHandle?.set(PICKED_EXERCISE_KEY, exerciseId)
-                            navController.popBackStack()
+                            fromFront(entry) {
+                                // Hand the choice to the screen that asked for it.
+                                previousBackStackEntry?.savedStateHandle?.set(PICKED_EXERCISE_KEY, exerciseId)
+                                popBackStack()
+                            }
                         },
-                        onBack = { navController.popBackStack() },
+                        onBack = { fromFront(entry) { popBackStack() } },
                     )
                 }
                 composable<ExerciseDetailRoute> { entry ->
                     ExerciseDetailScreen(
                         exerciseId = entry.toRoute<ExerciseDetailRoute>().exerciseId,
-                        onBack = { navController.popBackStack() },
+                        onBack = { fromFront(entry) { popBackStack() } },
                     )
                 }
                 composable<WorkoutDetailRoute> { entry ->
                     WorkoutDetailScreen(
                         workoutId = entry.toRoute<WorkoutDetailRoute>().workoutId,
-                        onBack = { navController.popBackStack() },
+                        onBack = { fromFront(entry) { popBackStack() } },
                     )
                 }
             }
