@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-   Overload keeps everything on the phone. Nothing is backed up by Android;
+   MuscleDot keeps everything on the phone. Nothing is backed up by Android;
    the only way data leaves the phone is the backup file the user exports.
    (Used on Android 11 and lower; newer versions read data_extraction_rules.xml.)
 -->

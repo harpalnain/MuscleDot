@@ -93,7 +93,7 @@ class ProfileContentTest {
         rule.setContent {
             OverloadTheme { WelcomeContent(ProfileUiState(), actions, onSkip = { skipped = true }, onDone = { done = true }) }
         }
-        rule.onNodeWithText("Welcome to Overload").assertIsDisplayed()
+        rule.onNodeWithText("Welcome to MuscleDot").assertIsDisplayed()
         rule.onNodeWithText("Skip").performClick()
         rule.onNodeWithText("Done").performClick()
         assertTrue(skipped && done)

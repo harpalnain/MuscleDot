@@ -6,6 +6,10 @@ import com.example.fit.domain.WorkoutStatus
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
+/**
+ * Written inside every backup file and checked on restore. It keeps the app's
+ * first name ("Overload") so backups made before the rename still open.
+ */
 const val BACKUP_FORMAT = "overload-backup"
 
 /** Raise when the file shape changes; older files must stay readable. */
@@ -82,5 +86,5 @@ data class BackupWorkout(
     val exercises: List<BackupWorkoutExercise>,
 )
 
-/** "overload-backup-2026-11-12.json" */
-fun backupFileName(date: LocalDate): String = "$BACKUP_FORMAT-$date.json"
+/** "muscledot-backup-2026-11-12.json" */
+fun backupFileName(date: LocalDate): String = "muscledot-backup-$date.json"

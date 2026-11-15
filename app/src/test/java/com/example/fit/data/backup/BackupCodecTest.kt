@@ -25,5 +25,5 @@ class BackupCodecTest {
         assertEquals(BackupException.Reason.NEWER_VERSION, reasonOf("{\"format\":\"overload-backup\",\"version\":2}"))
 
     @Test
-    fun fileName() = assertEquals("overload-backup-2026-11-12.json", backupFileName(LocalDate.of(2026, 11, 12)))
+    fun fileName() = assertEquals("muscledot-backup-2026-11-12.json", backupFileName(LocalDate.of(2026, 11, 12)))
 }

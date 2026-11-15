@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-   Overload keeps everything on the phone. Nothing goes to cloud backup and
+   MuscleDot keeps everything on the phone. Nothing goes to cloud backup and
    nothing is copied in a phone-to-phone transfer; the only way data leaves
    the phone is the backup file the user exports.
 -->

@@ -61,7 +61,7 @@ class AppGalleryTest {
     @Test
     fun screens() {
         launchApp(clock) { seedHistory(it, clock.now.toLocalDate()) }.use {
-            compose.awaitText("Welcome to Overload")
+            compose.awaitText("Welcome to MuscleDot")
             compose.saveScreenshot("01-welcome")
             compose.onNodeWithText("Skip").performClick()
 

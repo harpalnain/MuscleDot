@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Overload</string>
+    <string name="app_name">MuscleDot</string>
 
     <!-- Bottom tabs -->
     <string name="tab_today">Today</string>
@@ -55,7 +55,7 @@
     <string name="profile_body_weight_increase">Increase body weight</string>
     <string name="body_weight_chart_title">Body weight (kg)</string>
     <string name="body_weight_chart_empty">No body weight entered yet</string>
-    <string name="welcome_title">Welcome to Overload</string>
+    <string name="welcome_title">Welcome to MuscleDot</string>
     <string name="welcome_explanation">Tell the app a little about you. Body weight is used for exercises like pull-ups. You can skip this and fill it in later under Profile.</string>
     <string name="welcome_skip">Skip</string>
 
@@ -70,7 +70,7 @@
     <string name="backup_save_failed">The backup could not be saved. Try again, or pick another place.</string>
     <string name="backup_read_failed">That file could not be read</string>
     <string name="backup_restored">Backup restored</string>
-    <string name="backup_not_a_backup">That file is not an Overload backup</string>
+    <string name="backup_not_a_backup">That file is not a MuscleDot backup</string>
     <string name="backup_newer_version">That backup was made by a newer version of the app</string>
     <string name="picture_credits">Exercise pictures: free-exercise-db (public domain)</string>
 
